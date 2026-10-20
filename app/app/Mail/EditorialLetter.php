@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
  * A letter sent from the editorial desk (reviewer invitation, reminder, decision, proof, ...).
  * The body is ready HTML (the old pages also mailed whatever the editor typed in a textarea).
  */
-class EditorialLetter extends Mailable
+class EditorialLetter extends Mailable implements ShouldQueue
 {
     /**
      * @param  list<array{0: string, 1: string}>  $files  [disk, path] pairs; missing files are skipped

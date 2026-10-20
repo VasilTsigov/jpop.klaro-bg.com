@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Mail\EditorialLetter;
+use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Mail;
 
 class EditorialMail
@@ -34,6 +35,20 @@ class EditorialMail
         }
 
         return $ok;
+    }
+
+    /** Any other mailable: queued; a mail failure must not lose a recorded action. */
+    public static function deliver(array|string $to, Mailable $mailable): bool
+    {
+        try {
+            Mail::to($to)->send($mailable);
+
+            return true;
+        } catch (\Throwable $e) {
+            report($e);
+
+            return false;
+        }
     }
 
     /** "dd.mm.yyyy" + 1 month with PHP overflow (31.01 -> 03.03). LEGACY: splitDate() in myfunc.php. */

@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Mail\ConfirmRegistration;
 use App\Models\User;
+use App\Support\EditorialMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password as PasswordRule;
@@ -103,7 +103,7 @@ class AuthController extends Controller
             return $user;
         });
 
-        Mail::to($user->email)->send(new ConfirmRegistration($user));
+        EditorialMail::deliver($user->email, new ConfirmRegistration($user));
 
         return redirect()->route('thank-you');
     }

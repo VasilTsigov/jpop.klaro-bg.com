@@ -58,7 +58,7 @@ class EditorFlowTest extends TestCase
 
     private function sentTo(string $address, ?string $subject = null): bool
     {
-        return Mail::sent(EditorialLetter::class, fn (EditorialLetter $l) => $l->hasTo($address)
+        return Mail::queued(EditorialLetter::class, fn (EditorialLetter $l) => $l->hasTo($address)
             && ($subject === null || $l->mailSubject === $subject))->isNotEmpty();
     }
 
@@ -128,7 +128,7 @@ class EditorFlowTest extends TestCase
 
         $this->assertTrue($this->sentTo($this->reviewer->email, "Manuscript {$m->code_label} to review"));
         $this->assertTrue($this->sentTo('desk@example.com')); // copy for the editors
-        Mail::assertSent(EditorialLetter::class, function (EditorialLetter $l) use ($m) {
+        Mail::assertQueued(EditorialLetter::class, function (EditorialLetter $l) use ($m) {
             // the raw token is only in the mail, the database keeps its hash
             return $l->hasTo($this->reviewer->email)
                 && str_contains($l->letterHtml, 'I agree to review this submission.')
@@ -152,7 +152,7 @@ class EditorFlowTest extends TestCase
 
         $this->assertTrue($this->sentTo($this->reviewer->email, "Manuscript{$m->code_label} to review")); // LEGACY: no space
         $this->assertTrue($this->sentTo($this->reviewer->email, "Manuscript {$m->code_label} for review"));
-        Mail::assertSent(EditorialLetter::class, fn (EditorialLetter $l) => $l->hasTo($this->reviewer->email)
+        Mail::assertQueued(EditorialLetter::class, fn (EditorialLetter $l) => $l->hasTo($this->reviewer->email)
             && count($l->attachments()) === 3);
     }
 
@@ -164,7 +164,7 @@ class EditorFlowTest extends TestCase
         $closed = $this->manuscript(['status' => 1]);
         $this->post(route('editor.assign', [$closed, 1]), ['reviewer_id' => $this->reviewer->id])->assertSessionHasErrors();
         $this->assertSame(0, ManuscriptReview::count());
-        Mail::assertNothingSent();
+        Mail::assertNothingQueued();
     }
 
     public function test_agree_link_confirms_and_is_used_up_decline_empties_the_slot(): void
@@ -173,7 +173,7 @@ class EditorFlowTest extends TestCase
         $this->actingAs($this->editor);
         $links = function (int $slot) use ($m) {
             $this->post(route('editor.assign', [$m, $slot]), ['reviewer_id' => $this->reviewer->id]);
-            $mail = Mail::sent(EditorialLetter::class, fn ($l) => $l->hasTo($this->reviewer->email))->last();
+            $mail = Mail::queued(EditorialLetter::class, fn ($l) => $l->hasTo($this->reviewer->email))->last();
             preg_match_all('#/review/([A-Za-z0-9]{48})#', $mail->letterHtml, $t);
 
             return $t[1]; // [agree, decline]
@@ -200,7 +200,7 @@ class EditorFlowTest extends TestCase
         $this->assertNull($slot2->reviewer_id);
         $this->assertNull($slot2->reviewer_name);
         $this->assertTrue($this->sentTo('desk@example.com', 'Message from Reviewer'));
-        Mail::assertSent(EditorialLetter::class, fn ($l) => str_contains($l->letterHtml, 'No time, sorry'));
+        Mail::assertQueued(EditorialLetter::class, fn ($l) => str_contains($l->letterHtml, 'No time, sorry'));
     }
 
     public function test_expired_link_is_refused(): void
@@ -221,7 +221,7 @@ class EditorFlowTest extends TestCase
         $this->post(route('editor.resend', [$m, 1]))->assertRedirect();
         $this->assertSame(2, ReviewInvitation::count());
         $this->assertEmpty(array_intersect($old, ReviewInvitation::pluck('id')->all()));
-        Mail::assertSent(EditorialLetter::class, 2 + 1 + 1); // reviewer + desk copy, twice -> 4
+        Mail::assertQueued(EditorialLetter::class, 2 + 1 + 1); // reviewer + desk copy, twice -> 4
 
         $m->reviews()->update(['confirmed_state' => 'confirmed']);
         $this->post(route('editor.resend', [$m, 1]))->assertNotFound();
@@ -238,7 +238,7 @@ class EditorFlowTest extends TestCase
             ->assertRedirect(route('editor.list', 'inprogress'));
 
         $this->assertTrue($this->sentTo($this->reviewer->email, "Journal POP reminder late review {$m->code_label}"));
-        Mail::assertSent(EditorialLetter::class, fn ($l) => $l->hasTo($this->reviewer->email) && str_contains($l->letterHtml, 'Hurry') && ! str_contains($l->letterHtml, '<script'));
+        Mail::assertQueued(EditorialLetter::class, fn ($l) => $l->hasTo($this->reviewer->email) && str_contains($l->letterHtml, 'Hurry') && ! str_contains($l->letterHtml, '<script'));
         $this->get(route('editor.reminder', [$m, 2]))->assertNotFound(); // no reviewer in slot 2
     }
 
@@ -256,7 +256,7 @@ class EditorFlowTest extends TestCase
         Storage::disk('manuscripts')->assertExists($file->path);
         $this->assertNotNull($m->fresh()->editor_letter_at);
         $this->assertTrue($this->sentTo($this->author->email, 'Journal POP - Letter from the editor'));
-        Mail::assertSent(EditorialLetter::class, fn ($l) => $l->hasTo($this->author->email) && $l->files === [['manuscripts', $file->path]]);
+        Mail::assertQueued(EditorialLetter::class, fn ($l) => $l->hasTo($this->author->email) && $l->files === [['manuscripts', $file->path]]);
 
         // the author may fetch it, the other author may not (ManuscriptPolicy)
         $this->actingAs($this->author)->get(route('files.show', $file))->assertOk();
@@ -286,7 +286,7 @@ class EditorFlowTest extends TestCase
         $this->post(route('editor.status', $m), ['status' => 7])->assertSessionHasErrors('status');
         $this->post(route('editor.status', $m), ['status' => 0]);
         $this->assertSame(0, (int) $m->fresh()->status);
-        Mail::assertNothingSent();
+        Mail::assertNothingQueued();
     }
 
     public function test_letters_to_reviewers_carry_the_other_recommendations_and_the_decision_letter(): void
@@ -308,8 +308,8 @@ class EditorFlowTest extends TestCase
 
         $this->assertTrue($this->sentTo($this->reviewer->email, 'Letter to Reviewer'));
         $this->assertTrue($this->sentTo($second->email, 'Letter to Reviewer'));
-        Mail::assertSent(EditorialLetter::class, fn ($l) => $l->hasTo($second->email) && $l->files === [['manuscripts', 'editletter/x.docx']]);
-        Mail::assertNotSent(EditorialLetter::class, fn ($l) => str_contains($l->letterHtml, 'nobody'));
+        Mail::assertQueued(EditorialLetter::class, fn ($l) => $l->hasTo($second->email) && $l->files === [['manuscripts', 'editletter/x.docx']]);
+        Mail::assertNotQueued(EditorialLetter::class, fn ($l) => str_contains($l->letterHtml, 'nobody'));
     }
 
     public function test_proof_upload_stores_both_files_and_mails_the_author(): void
@@ -327,7 +327,7 @@ class EditorFlowTest extends TestCase
         $this->assertNotNull($m->proof_at);
         $this->assertNotNull($m->proof_editor_at);
         $this->assertTrue($this->sentTo($this->author->email, 'Journal POP - Proof File'));
-        Mail::assertSent(EditorialLetter::class, fn ($l) => $l->hasTo($this->author->email) && count($l->files) === 2);
+        Mail::assertQueued(EditorialLetter::class, fn ($l) => $l->hasTo($this->author->email) && count($l->files) === 2);
 
         $this->post(route('editor.proof', $m), ['proof' => UploadedFile::fake()->create('p.pdf', 10)])
             ->assertSessionHasErrors('proof_letter');

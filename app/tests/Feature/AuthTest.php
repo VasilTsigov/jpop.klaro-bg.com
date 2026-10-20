@@ -80,7 +80,7 @@ class AuthTest extends TestCase
         $user = User::where('email', 'new@example.com')->firstOrFail();
         $this->assertSame('author', $user->role);
         $this->assertNull($user->email_verified_at);
-        Mail::assertSent(ConfirmRegistration::class, fn ($m) => $m->hasTo('new@example.com'));
+        Mail::assertQueued(ConfirmRegistration::class, fn ($m) => $m->hasTo('new@example.com'));
 
         $this->post('/users/login', ['email' => 'new@example.com', 'password' => 'abcdef'])->assertSessionHasErrors('email');
 

@@ -2,13 +2,14 @@
 
 namespace App\Mail;
 
+use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Models\User;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 
-class ConfirmRegistration extends Mailable
+class ConfirmRegistration extends Mailable implements ShouldQueue
 {
     public function __construct(public User $user) {}
 

@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Models\Manuscript;
 use App\Models\User;
 use Illuminate\Mail\Mailable;
@@ -10,7 +11,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 
 /** To the editors when the author uploaded the corrected manuscript (waue_mscr_UpldFileCorrected_1.php). */
-class CorrectedUploaded extends Mailable
+class CorrectedUploaded extends Mailable implements ShouldQueue
 {
     public function __construct(public User $author, public Manuscript $manuscript) {}
 

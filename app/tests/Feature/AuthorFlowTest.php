@@ -69,9 +69,9 @@ class AuthorFlowTest extends TestCase
         $this->assertTrue($m->files->every(fn ($f) => $f->disk === 'manuscripts'));
         $this->assertDatabaseHas('activity_log', ['content' => 'Submit manuscript']);
 
-        Mail::assertSent(SubmissionReceived::class, fn ($mail) => $mail->hasTo($this->author->email)
+        Mail::assertQueued(SubmissionReceived::class, fn ($mail) => $mail->hasTo($this->author->email)
             && $mail->hasSubject('Instructions to  author'));
-        Mail::assertSent(SubmissionNotice::class, fn ($mail) => $mail->hasTo('ed@example.com') && $mail->hasTo('ed2@example.com'));
+        Mail::assertQueued(SubmissionNotice::class, fn ($mail) => $mail->hasTo('ed@example.com') && $mail->hasTo('ed2@example.com'));
     }
 
     public function test_first_manuscript_in_an_empty_database_gets_code_1(): void
@@ -95,7 +95,7 @@ class AuthorFlowTest extends TestCase
         ]))->assertSessionHasErrors('photo');
 
         $this->assertSame(0, Manuscript::count());
-        Mail::assertNothingSent();
+        Mail::assertNothingQueued();
     }
 
     public function test_only_authors_can_submit_or_list(): void
@@ -154,7 +154,7 @@ class AuthorFlowTest extends TestCase
         $this->assertSame('Corrected manuscript.', $m->corrected_state);
         $this->assertNotNull($m->corrected_at);
         $this->assertDatabaseHas('activity_log', ['content' => 'Upload Corrected File']);
-        Mail::assertSent(CorrectedUploaded::class, 2);
+        Mail::assertQueued(CorrectedUploaded::class, 2);
     }
 
     public function test_corrected_figures_use_their_own_types_and_never_overwrite_originals(): void
@@ -191,7 +191,7 @@ class AuthorFlowTest extends TestCase
             $this->actingAs($u)->post(route('manuscripts.figures', $m), ['photo' => [1 => UploadedFile::fake()->create('a.jpg', 1)]])->assertForbidden();
         }
         $this->assertSame(0, ManuscriptFile::count());
-        Mail::assertNothingSent();
+        Mail::assertNothingQueued();
     }
 
     public function test_uploaded_files_are_served_to_the_author_through_the_policy(): void
@@ -208,6 +208,6 @@ class AuthorFlowTest extends TestCase
         $e = User::factory()->create(['role' => 'editor', 'email_verified_at' => now()]);
         $this->actingAs($this->author)->post(route('manuscripts.store'), $this->payload())->assertRedirect();
 
-        Mail::assertSent(SubmissionNotice::class, fn ($mail) => $mail->hasTo($e->email));
+        Mail::assertQueued(SubmissionNotice::class, fn ($mail) => $mail->hasTo($e->email));
     }
 }

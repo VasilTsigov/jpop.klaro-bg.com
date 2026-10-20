@@ -7,12 +7,12 @@ use App\Mail\SubmissionNotice;
 use App\Mail\SubmissionReceived;
 use App\Models\Manuscript;
 use App\Support\ActivityLog;
+use App\Support\EditorialMail;
 use App\Support\EditorRecipients;
 use App\Support\ManuscriptUploads;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Mail;
 
 /** Author flow (docs/01-analysis.md steps A and D). Access: ManuscriptPolicy::submit / correct. */
 class ManuscriptController extends Controller
@@ -82,8 +82,8 @@ class ManuscriptController extends Controller
         $uploads->commit();
 
         ActivityLog::write($request, 'Submit manuscript');
-        $this->send($user->email, new SubmissionReceived($user, $manuscript));
-        $this->send(EditorRecipients::emails(), new SubmissionNotice($user, $manuscript));
+        EditorialMail::deliver($user->email, new SubmissionReceived($user, $manuscript));
+        EditorialMail::deliver(EditorRecipients::emails(), new SubmissionNotice($user, $manuscript));
 
         return redirect()->route('manuscripts.index')
             ->with('status', "Thank you! Your manuscript {$manuscript->code_label} was submitted.");
@@ -113,7 +113,7 @@ class ManuscriptController extends Controller
         $uploads->commit();
 
         ActivityLog::write($request, 'Upload Corrected File');
-        $this->send(EditorRecipients::emails(), new CorrectedUploaded($request->user(), $manuscript));
+        EditorialMail::deliver(EditorRecipients::emails(), new CorrectedUploaded($request->user(), $manuscript));
 
         return redirect()->route('manuscripts.index')->with('status', 'Corrected manuscript uploaded.');
     }
@@ -172,14 +172,5 @@ class ManuscriptController extends Controller
             }
         }
     }
-
-    /** A mail failure must not lose a submitted manuscript. */
-    private function send(array|string $to, $mailable): void
-    {
-        try {
-            Mail::to($to)->send($mailable);
-        } catch (\Throwable $e) {
-            report($e);
-        }
-    }
 }
+

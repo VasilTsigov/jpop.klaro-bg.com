@@ -78,7 +78,7 @@ class ReviewerFlowTest extends TestCase
         $this->assertSame('review', $this->m->files()->find($r->review_file_id)->type);
         $this->assertDatabaseHas('manuscript_events', ['manuscript_id' => 501, 'event' => 'review_uploaded']);
 
-        $to = fn ($a) => Mail::sent(EditorialLetter::class, fn ($l) => $l->hasTo($a));
+        $to = fn ($a) => Mail::queued(EditorialLetter::class, fn ($l) => $l->hasTo($a));
         $this->assertCount(1, $to($this->author->email));
         $this->assertCount(1, $to('desk@example.com'));
         $this->assertSame('Reviewer Rob Reviewer uploads file', $to('desk@example.com')->first()->mailSubject);

@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Models\Manuscript;
 use App\Models\User;
 use Illuminate\Mail\Attachment;
@@ -12,7 +13,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Support\Facades\Storage;
 
 /** To the author after submitting (webassist/email/waue_mscr_Submit_1.php). */
-class SubmissionReceived extends Mailable
+class SubmissionReceived extends Mailable implements ShouldQueue
 {
     public function __construct(public User $author, public Manuscript $manuscript) {}
 
