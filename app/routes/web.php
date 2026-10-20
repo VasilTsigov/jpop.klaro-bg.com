@@ -5,6 +5,7 @@ use App\Http\Controllers\EditorController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\ManuscriptController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReviewerController;
 use App\Http\Controllers\ReviewInvitationController;
 use Illuminate\Support\Facades\Route;
 
@@ -43,6 +44,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile', [ProfileController::class, 'update']);
     Route::get('/profile/change-password', [ProfileController::class, 'showPassword'])->name('profile.password');
     Route::post('/profile/change-password', [ProfileController::class, 'updatePassword']);
+
+    // Reviewer: own assignments and review upload (ManuscriptPolicy::uploadReview)
+    Route::get('/reviews', [ReviewerController::class, 'index'])->name('reviews.index');
+    Route::get('/reviews/{review}/upload', [ReviewerController::class, 'create'])->whereNumber('review')->name('reviews.upload');
+    Route::post('/reviews/{review}/upload', [ReviewerController::class, 'store'])->whereNumber('review');
+    Route::get('/help/{name}', [ReviewerController::class, 'help'])->where('name', 'checklist|instructions')->name('reviews.help');
 
     // Editorial desk – editors only (ManuscriptPolicy::editorial)
     Route::middleware('can:editorial,App\Models\Manuscript')->prefix('editor')->group(function () {

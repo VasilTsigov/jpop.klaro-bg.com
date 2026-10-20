@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\ManuscriptReview;
+use App\Policies\ManuscriptPolicy;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // one policy for the manuscript and its review slots
+        Gate::policy(ManuscriptReview::class, ManuscriptPolicy::class);
     }
 }

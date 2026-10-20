@@ -34,6 +34,9 @@ textarea{width:100%;box-sizing:border-box}
         <a href="{{ route('manuscripts.create') }}">Submit Manuscripts</a>
         <a href="{{ route('manuscripts.index') }}">Manuscripts</a>
       @endif
+      @if (auth()->user()->role === 'reviewer')
+        <a href="{{ route('reviews.index') }}">Manuscripts for review</a>
+      @endif
       @if (auth()->user()->role === 'editor')
         <a href="{{ route('editor.list', 'inprogress') }}">All Manuscripts</a>
         <a href="{{ route('editor.list', 'rejected') }}">Rejected</a>

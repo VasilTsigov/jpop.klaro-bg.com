@@ -26,6 +26,8 @@ class ManuscriptUploads
         'editor_letter' => ['editletter', '_editor_letter'],
         'proof' => ['proof', '_proof'],
         'proof_letter' => ['editletter', '_proof_letter'],
+        'review' => ['reviewered', '(reviewer{n})'],
+        'checklist' => ['checklist', '(checklist-reviewer{n})'],
     ];
 
     /** @var list<string> paths written during this request, removed again if the request fails */

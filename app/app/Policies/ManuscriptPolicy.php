@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Manuscript;
 use App\Models\ManuscriptFile;
+use App\Models\ManuscriptReview;
 use App\Models\User;
 
 /**
@@ -37,6 +38,12 @@ class ManuscriptPolicy
     public function correct(User $user, Manuscript $manuscript): bool
     {
         return $user->role === 'author' && $manuscript->author_id === $user->id;
+    }
+
+    /** Reviewer's own upload page: only the slot assigned to them (a declined slot has no reviewer). */
+    public function uploadReview(User $user, ManuscriptReview $review): bool
+    {
+        return $user->role === 'reviewer' && $review->reviewer_id === $user->id && $review->confirmed_state !== 'declined';
     }
 
     public function downloadFile(User $user, Manuscript $manuscript, ManuscriptFile $file): bool
