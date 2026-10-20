@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('title', 'Login')
+@section('main_class', 'narrow')
 @section('content')
 <form method="post" action="{{ route('login') }}">@csrf
   <label>Email</label><input type="text" name="email" value="{{ old('email') }}" autofocus>

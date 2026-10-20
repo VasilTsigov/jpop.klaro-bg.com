@@ -1,1 +1,4 @@
-<html><head></head><body>{!! $letterHtml !!}</body></html>
+@extends('mail.layout')
+@section('body')
+{!! $letterHtml !!}
+@endsection

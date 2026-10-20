@@ -1,4 +1,6 @@
-<html><head></head><body>
+@extends('mail.layout')
+@section('body')
+
 Dear Dr. {{ $author->first_name }} {{ $author->last_name }},<br /><br />
 
 Thank you for the submited manusctript - JPOP {{ $manuscript->code }}. It will be sending to reviewers and will be considered for publication in Journal Propagation of Ornamental Plants.<br />
@@ -21,4 +23,5 @@ Please remember to quote the <strong>manuscript number (JPOP{{ $manuscript->code
 <p>With best regards<br />
   <a href="http://journal-pop.org/" target="_blank">journal</a> POP<br />
   Editorial office </p>
-</body></html>
+
+@endsection

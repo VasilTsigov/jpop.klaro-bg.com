@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Upload corrected figures')
 @section('content')
-<p><strong>{{ $manuscript->code_label }}</strong> – {{ $manuscript->title }}</p>
+<p class="ms-ref"><strong>{{ $manuscript->code_label }}</strong> – {{ $manuscript->title }}</p>
 <form method="post" action="{{ route('manuscripts.figures', $manuscript) }}" enctype="multipart/form-data">
   @csrf
   <label>Corrected photographs:</label>

@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('title', 'Change Password')
+@section('main_class', 'narrow')
 @section('content')
 <form method="post" action="{{ route('profile.password') }}">@csrf
   <label>New Password</label><input type="password" name="password">

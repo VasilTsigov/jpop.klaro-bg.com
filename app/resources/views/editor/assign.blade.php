@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', "Reviewer $slot")
 @section('content')
-<p><strong>{{ $manuscript->code_label }}</strong> – {{ $manuscript->title }}</p>
+<p class="ms-ref"><strong>{{ $manuscript->code_label }}</strong> – {{ $manuscript->title }}</p>
 <form method="post" action="{{ route('editor.assign', [$manuscript, $slot]) }}">
   @csrf
   <label for="reviewer_id">Reviewer:</label>
@@ -13,6 +13,6 @@
   </select>
   <p>An e-mail with the agree / decline links is sent to the reviewer.</p>
   <button class="btn">Send to reviewer</button>
-  <a href="{{ route('editor.list', 'inprogress') }}">Cancel</a>
+  <a class="btn ghost" href="{{ route('editor.list', 'inprogress') }}">Cancel</a>
 </form>
 @endsection

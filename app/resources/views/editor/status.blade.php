@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Change status')
 @section('content')
-<p><strong>{{ $manuscript->code_label }}</strong> – {{ $manuscript->title }}<br>Author: {{ $manuscript->author->first_name }} {{ $manuscript->author->last_name }}</p>
+<p class="ms-ref"><strong>{{ $manuscript->code_label }}</strong> – {{ $manuscript->title }}<br>Author: {{ $manuscript->author->first_name }} {{ $manuscript->author->last_name }}</p>
 <form method="post" action="{{ route('editor.status', $manuscript) }}">
   @csrf
   <label for="status">Status:</label>

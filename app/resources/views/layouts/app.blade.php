@@ -11,7 +11,15 @@
     $cur = fn ($url) => url()->current() === $url ? ' aria-current=page' : '';
 @endphp
 <header class="site-header"><div class="bar">
+<div class="top">
   <a class="brand" href="{{ url('/') }}"><img src="{{ asset('images/logo.png') }}" alt="" width="74" height="74"><span><strong>PROPAGATION OF ORNAMENTAL PLANTS</strong><small>Online Manuscript Submission, Review and Tracking System</small></span></a>
+  <div class="account">
+    @auth
+      <a class="user" href="{{ route('profile') }}"{!! $cur(route('profile')) !!} title="Profile">{{ auth()->user()->email }}</a>
+      <form method="post" action="{{ route('logout') }}">@csrf<button>Log out</button></form>
+    @endauth
+  </div>
+</div>
   <nav class="nav" aria-label="Main">
     @auth
       <a href="{{ route('welcome') }}"{!! $cur(route('welcome')) !!}>Home</a>
@@ -28,9 +36,6 @@
         <a href="{{ route('editor.list', 'published') }}"{!! $cur(route('editor.list', 'published')) !!}>Published</a>
         <a href="{{ route('editor.search') }}"{!! $cur(route('editor.search')) !!}>Search</a>
       @endif
-      <span class="sep"></span>
-      <a class="user" href="{{ route('profile') }}"{!! $cur(route('profile')) !!}>{{ auth()->user()->email }}</a>
-      <form method="post" action="{{ route('logout') }}">@csrf<button>Log out</button></form>
     @else
       <a href="{{ route('home') }}"{!! $cur(route('home')) !!}>Home</a>
       <a href="{{ route('login') }}"{!! $cur(route('login')) !!}>Login</a>

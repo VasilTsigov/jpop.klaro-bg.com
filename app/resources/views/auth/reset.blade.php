@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('title', 'Set a new password')
+@section('main_class', 'narrow')
 @section('content')
 <form method="post" action="{{ route('password.update') }}">@csrf
   <input type="hidden" name="token" value="{{ $token }}">
