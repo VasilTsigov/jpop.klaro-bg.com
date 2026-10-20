@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FileController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +24,7 @@ Route::get('/users/thank-you', fn () => view('auth.thank-you'))->name('thank-you
 Route::middleware('auth')->group(function () {
     Route::post('/users/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/users/welcome', fn () => view('auth.welcome'))->name('welcome');
+    Route::get('/files/{file}', [FileController::class, 'show'])->whereNumber('file')->name('files.show');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
     Route::post('/profile', [ProfileController::class, 'update']);
     Route::get('/profile/change-password', [ProfileController::class, 'showPassword'])->name('profile.password');

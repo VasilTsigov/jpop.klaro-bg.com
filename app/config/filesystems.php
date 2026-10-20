@@ -33,7 +33,25 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            'serve' => false, // no /storage/{path} route: files go only through FileController
+            'throw' => false,
+            'report' => false,
+        ],
+
+        // Old site files (files/manuscripts, files/reviewered, ...). Read-only; paths in
+        // manuscript_files.path are relative to this root ("manuscripts/JPOP123.doc").
+        'legacy_files' => [
+            'driver' => 'local',
+            'root' => env('JPOP_LEGACY_FILES', storage_path('app/legacy-files')),
+            'read-only' => true,
+            'throw' => false,
+            'report' => false,
+        ],
+
+        // New uploads (4.3+). Private, never web-served: only FileController reads it.
+        'manuscripts' => [
+            'driver' => 'local',
+            'root' => env('JPOP_FILES', storage_path('app/private/manuscripts')),
             'throw' => false,
             'report' => false,
         ],
