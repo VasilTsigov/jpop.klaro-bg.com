@@ -37,7 +37,7 @@ q() { MYSQL_PWD="$DBP" mysql -u"$DBU" -N -e "$1" "$DBN"; }
 [ "$(q 'select count(*) from users')" = 1164 ] || fail "users != 1164"
 [ "$(q 'select count(*) from manuscripts')" = 1347 ] || fail "manuscripts != 1347"
 [ "$(q 'select count(*) from activity_log')" = 7217 ] || fail "activity_log != 7217"
-[ "$(q "select count(*) from manuscripts where status='rejected'")" = 1121 ] || fail "rejected != 1121"
+[ "$(q "select count(*) from manuscripts where status=1")" = 1121 ] || fail "rejected (status 1) != 1121"
 echo "counts ok"
 
 step "6. Smoke test as production (APP_ENV=production, files from the copied dir)"
