@@ -13,6 +13,7 @@ use App\Support\ManuscriptUploads;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -48,6 +49,7 @@ class EditorController extends Controller
 
     public function assignForm(Manuscript $manuscript, int $slot)
     {
+        Gate::authorize('manageReview', $manuscript);
         $reviewers = User::where('role', 'reviewer')->orderBy('last_name')->orderBy('first_name')->get();
 
         return view('editor.assign', compact('manuscript', 'slot', 'reviewers'));
@@ -55,6 +57,7 @@ class EditorController extends Controller
 
     public function assign(Request $request, Manuscript $manuscript, int $slot)
     {
+        Gate::authorize('manageReview', $manuscript);
         $data = $request->validate([
             'reviewer_id' => ['required', Rule::exists('users', 'id')->where('role', 'reviewer')],
         ]);
@@ -93,6 +96,7 @@ class EditorController extends Controller
     /** Fallback when the invitation never arrived (decision 2026-10-20): new links, old ones stop working. */
     public function resend(Request $request, Manuscript $manuscript, int $slot)
     {
+        Gate::authorize('manageReview', $manuscript);
         $review = $manuscript->reviews()->with('reviewer')->where('slot', $slot)->firstOrFail();
         abort_unless($review->reviewer && $review->confirmed_state === 'pending' && (int) $manuscript->status === 0, 404);
 
@@ -104,6 +108,7 @@ class EditorController extends Controller
 
     public function reminderForm(Manuscript $manuscript, int $slot)
     {
+        Gate::authorize('manageReview', $manuscript);
         $review = $this->assignedReview($manuscript, $slot);
         $text = view('mail.reviewer-reminder', [
             'reviewerName' => "{$review->reviewer->first_name} {$review->reviewer->last_name}",
@@ -116,6 +121,7 @@ class EditorController extends Controller
 
     public function reminder(Request $request, Manuscript $manuscript, int $slot)
     {
+        Gate::authorize('manageReview', $manuscript);
         $review = $this->assignedReview($manuscript, $slot);
         $data = $request->validate(['reminder' => 'required|string|max:65000']);
 
@@ -133,11 +139,13 @@ class EditorController extends Controller
 
     public function decisionForm(Manuscript $manuscript)
     {
+        Gate::authorize('manageReview', $manuscript);
         return view('editor.decision', compact('manuscript'));
     }
 
     public function decision(Request $request, Manuscript $manuscript, ManuscriptUploads $uploads)
     {
+        Gate::authorize('manageReview', $manuscript);
         $request->validate(['letter' => $this->fileRule()]);
 
         $file = $this->storeUploads($uploads, function () use ($manuscript, $request, $uploads) {
@@ -161,11 +169,13 @@ class EditorController extends Controller
 
     public function rejectForm(Manuscript $manuscript)
     {
+        Gate::authorize('manageReview', $manuscript);
         return view('editor.reject', compact('manuscript'));
     }
 
     public function reject(Request $request, Manuscript $manuscript)
     {
+        Gate::authorize('manageReview', $manuscript);
         $manuscript->update(['status' => 1]);
         $this->event($manuscript, 'rejected_directly');
         ActivityLog::write($request, 'Direct Reject');
@@ -183,6 +193,7 @@ class EditorController extends Controller
 
     public function statusForm(Manuscript $manuscript)
     {
+        Gate::authorize('manageReview', $manuscript);
         $manuscript->load('author', 'reviews.reviewer');
         $letters = [];
         foreach ($manuscript->reviews->sortBy('slot') as $review) {
@@ -196,6 +207,7 @@ class EditorController extends Controller
 
     public function status(Request $request, Manuscript $manuscript)
     {
+        Gate::authorize('manageReview', $manuscript);
         $data = $request->validate(['status' => 'required|in:0,1,2']);
         $manuscript->update(['status' => (int) $data['status']]);
         $this->event($manuscript, 'status_changed', ['status' => (int) $data['status']]);
@@ -208,6 +220,7 @@ class EditorController extends Controller
     /** "Letter to Reviewer": the editor may edit each text before it is mailed with the decision letter. */
     public function sendLetters(Request $request, Manuscript $manuscript)
     {
+        Gate::authorize('manageReview', $manuscript);
         $data = $request->validate(['letter' => 'required|array', 'letter.*' => 'nullable|string|max:65000']);
         $manuscript->load('reviews.reviewer');
         $attach = $manuscript->files()->where('type', 'editor_letter')->first();
@@ -235,11 +248,13 @@ class EditorController extends Controller
 
     public function proofForm(Manuscript $manuscript)
     {
+        Gate::authorize('manageReview', $manuscript);
         return view('editor.proof', compact('manuscript'));
     }
 
     public function proof(Request $request, Manuscript $manuscript, ManuscriptUploads $uploads)
     {
+        Gate::authorize('manageReview', $manuscript);
         $request->validate(['proof' => $this->fileRule(), 'proof_letter' => $this->fileRule()]);
 
         [$proof, $letter] = $this->storeUploads($uploads, function () use ($manuscript, $request, $uploads) {

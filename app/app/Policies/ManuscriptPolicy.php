@@ -28,16 +28,25 @@ class ManuscriptPolicy
         return $user->role === 'editor';
     }
 
-    /** Submit a new manuscript / list one's own (plan §4: authors only). */
+    /** Submit a new manuscript / list one's own: authors, and editors/admins as authors (decision 2026-10-20). */
     public function submit(User $user): bool
     {
-        return $user->role === 'author';
+        return in_array($user->role, ['author', 'editor'], true);
+    }
+
+    /**
+     * Editorial handling of a manuscript (reviewers, reminders, decision, reject, status, letters, proof): an editor may not do it for their own
+     * manuscript – another editor must (conflict of interest, decision 2026-10-20).
+     */
+    public function manageReview(User $user, Manuscript $manuscript): bool
+    {
+        return $user->role === 'editor' && $manuscript->author_id !== $user->id;
     }
 
     /** Corrected manuscript and corrected figures: only the manuscript's own author. */
     public function correct(User $user, Manuscript $manuscript): bool
     {
-        return $user->role === 'author' && $manuscript->author_id === $user->id;
+        return $this->submit($user) && $manuscript->author_id === $user->id;
     }
 
     /** Reviewer's own upload page: only the slot assigned to them (a declined slot has no reviewer). */

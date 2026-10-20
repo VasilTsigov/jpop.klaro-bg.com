@@ -156,6 +156,24 @@ class EditorFlowTest extends TestCase
             && count($l->attachments()) === 3);
     }
 
+    public function test_editor_cannot_send_own_manuscript_to_review_but_another_editor_can(): void
+    {
+        $m = $this->manuscript(['author_id' => $this->editor->id]);
+        $this->actingAs($this->editor)->get(route('editor.assign', [$m, 1]))->assertForbidden();
+        $this->post(route('editor.assign', [$m, 1]), ['reviewer_id' => $this->reviewer->id])->assertForbidden();
+        $this->assertSame(0, $m->reviews()->count());
+        foreach (['decision', 'reject', 'status', 'proof'] as $route) {
+            $this->get(route("editor.$route", $m))->assertForbidden();
+        }
+        $this->post(route('editor.status', $m), ['status' => 2])->assertForbidden();
+        $this->assertSame(0, (int) $m->fresh()->status);
+
+        $other = User::factory()->create(['role' => 'editor']);
+        $this->actingAs($other)->post(route('editor.assign', [$m, 1]), ['reviewer_id' => $this->reviewer->id])
+            ->assertRedirect();
+        $this->assertSame(1, $m->reviews()->count());
+    }
+
     public function test_only_reviewers_can_be_assigned_and_only_to_manuscripts_in_progress(): void
     {
         $m = $this->manuscript();

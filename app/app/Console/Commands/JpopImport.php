@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Facades\Schema;
 
 class JpopImport extends Command
 {
@@ -58,7 +59,10 @@ class JpopImport extends Command
     {
         $db = config('database.connections.legacy');
         $this->info("Loading $path into {$db['database']}");
+
         DB::connection('legacy')->statement('SELECT 1'); // fail early if the DB is missing
+        // The dump has plain CREATE TABLE: start from an empty staging DB so a re-run works.
+        Schema::connection('legacy')->dropAllTables();
         $result = Process::timeout(600)->input(fopen($path, 'r'))->run([
             'mysql', '-h', $db['host'], '-P', (string) $db['port'], '-u', $db['username'],
             '-p' . $db['password'], $db['database'],

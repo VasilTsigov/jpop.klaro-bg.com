@@ -30,7 +30,7 @@ textarea{width:100%;box-sizing:border-box}
   <nav>
     @auth
       <a href="{{ route('welcome') }}">Home</a>
-      @if (auth()->user()->role === 'author')
+      @if (in_array(auth()->user()->role, ['author', 'editor']))
         <a href="{{ route('manuscripts.create') }}">Submit Manuscripts</a>
         <a href="{{ route('manuscripts.index') }}">Manuscripts</a>
       @endif

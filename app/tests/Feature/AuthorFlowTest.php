@@ -98,9 +98,13 @@ class AuthorFlowTest extends TestCase
         Mail::assertNothingQueued();
     }
 
-    public function test_only_authors_can_submit_or_list(): void
+    public function test_editors_can_submit_as_authors_but_reviewers_cannot(): void
     {
-        foreach (['reviewer', 'editor'] as $role) {
+        $e = User::factory()->create(['role' => 'editor']);
+        $this->actingAs($e)->get(route('manuscripts.create'))->assertOk();
+        $this->actingAs($e)->get(route('manuscripts.index'))->assertOk();
+
+        foreach (['reviewer'] as $role) {
             $u = User::factory()->create(['role' => $role]);
             $this->actingAs($u)->get(route('manuscripts.create'))->assertForbidden();
             $this->actingAs($u)->get(route('manuscripts.index'))->assertForbidden();

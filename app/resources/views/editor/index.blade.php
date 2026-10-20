@@ -23,7 +23,7 @@
       <tr>
         <td colspan="2">
           {{ $slot }}. [
-          @if ($inProgress)
+          @if ($inProgress && $m->author_id !== auth()->id())
             <a href="{{ route('editor.assign', [$m, $slot]) }}">{{ $r?->reviewer_name ?: 'Reviewer '.$slot }}</a>
           @else
             {{ $r?->reviewer_name ?: 'Reviewer '.$slot }}
