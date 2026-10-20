@@ -1,0 +1,10 @@
+<wa_datamodel>
+  <wa_table>
+    <index>0</index>
+    <table_name>users</table_name>
+    <table_alias>users</table_alias>
+    <columns>UserID,UserEmail,UserName,UserPassword,UserFirstName,UserLastName,UserCity,UserState,UserZip,UserEmailVerified,UserRegistrationDate,UserVerificationCode,UserIP,UserPhone,UserFax,UserCountry,UserAddress,UserAddress2,UserLavel</columns>
+    <position>92px,96px</position>
+    <connections></connections>
+  </wa_table>
+</wa_datamodel>

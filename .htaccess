@@ -1,0 +1,14 @@
+ErrorDocument 400 /error_pages/400.shtml
+ErrorDocument 401 /error_pages/401.shtml
+ErrorDocument 403 /error_pages/403.shtml
+ErrorDocument 404 /error_pages/404.shtml
+ErrorDocument 408 /error_pages/408.shtml
+ErrorDocument 500 /error_pages/500.shtml
+
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule (.*) https://%{SERVER_NAME}/$1 [R=301,L]
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# This domain inherits the “PHP” package.
+# php -- END cPanel-generated handler, do not edit

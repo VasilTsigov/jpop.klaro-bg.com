@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="robots" content="noindex, nofollow">
+    <title>ГРЕШКА 403 - Забранен достъп</title>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 10px;
+            font-family: Arial;
+            background-color: #efefef;
+            text-align: center;
+        }
+
+        h1 {
+            border: 1px solid #e1e1e1;
+            background-color: #ffffff;
+            padding: 20px;
+            margin: 30px auto;
+            font-size: 24px;
+            width: 480px;
+
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            -khtml-border-radius: 5px;
+            border-radius: 5px;
+
+            -webkit-box-shadow: 3px 3px 3px rgba(175, 175, 175, 0.75);
+            -moz-box-shadow:    3px 3px 3px rgba(175, 175, 175, 0.75);
+            box-shadow:         3px 3px 3px rgba(175, 175, 175, 0.75);
+        }
+
+        a {
+            text-decoration: none;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #5f5f5f;
+        }
+
+        .text-box {
+            margin: 0px auto;
+            text-align: left;
+            width: 640px;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .text-box-title {
+            font-weight: bold; font-size: 18px;
+        }
+
+        #homepage-url {
+            font-size: 14px;
+            font-weight: 400;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1><b>ГРЕШКА 403</b> - Забранен достъп</h1>
+
+    <br />
+
+    <div class="text-box-title">Какво означава?</div>
+    <br />
+    <div class="text-box">
+        Уеб сайтът отказва да покаже тази уеб страница. Това може да се дължи на различни причини:
+        <ul>
+            <li>Опитвате се да заредите страница, която се генерира динамично от сайта и няма постоянен уеб адрес - например като използвате временния линк на страница на количка за пазаруване в електронен магазин.</li>
+            <li> Опитвате се да отворите папка от сайта, в която няма страници или няма указана страница за зареждане по подразбиране, а за самата папка е забранено извеждането на списъка на файловете в нея.</li>
+            <li>Достъпът до страницата е филтриран от администратора на сайта по някакви критерии, които вашата заявка не покрива.</li>
+        </ul>
+    </div>
+
+    <br />
+
+    <div class="text-box-title">Какво да направя?</div>
+    <div class="text-box">
+        <ul>
+            <li>Уверете, че разполагате с правилен адрес. Ако той е връзка, може да е с изтекъл срок или да не е наличен на уеб сайта.</li>
+            <li>Обърнете се към администратора на сайта.</li>
+        </ul>
+    </div>
+
+    <br />
+
+    <div class="text-box-title">Начална страница:</div>
+    <a id="homepage-url" href="http://<!--#echo var="HTTP_HOST" -->"><!--#echo var="HTTP_HOST" --></a>
+</body>
+</html>

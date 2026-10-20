@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="robots" content="noindex, nofollow">
+    <title>ГРЕШКА 500 - Сървърна грешка</title>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 10px;
+            font-family: Arial;
+            background-color: #efefef;
+            text-align: center;
+        }
+
+        h1 {
+            border: 1px solid #e1e1e1;
+            background-color: #ffffff;
+            padding: 20px;
+            margin: 30px auto;
+            font-size: 24px;
+            width: 480px;
+
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            -khtml-border-radius: 5px;
+            border-radius: 5px;
+
+            -webkit-box-shadow: 3px 3px 3px rgba(175, 175, 175, 0.75);
+            -moz-box-shadow:    3px 3px 3px rgba(175, 175, 175, 0.75);
+            box-shadow:         3px 3px 3px rgba(175, 175, 175, 0.75);
+        }
+
+        a {
+            text-decoration: none;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #5f5f5f;
+        }
+
+        .text-box {
+            margin: 0px auto;
+            text-align: left;
+            width: 640px;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .text-box-title {
+            font-weight: bold; font-size: 18px;
+        }
+
+        #homepage-url {
+            font-size: 14px;
+            font-weight: 400;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1><b>ГРЕШКА 500</b> - Сървърна грешка</h1>
+
+    <br />
+
+    <div class="text-box-title">Какво означава?</div>
+    <br />
+    <div class="text-box">
+        Уеб сървърт, на който се намира посетеният от вас уеб сайт, не позволява показването на избраната страница.
+        Причина за това може да е грешка в скрипт, който генерира странцата или друго.
+    </div>
+
+    <br />
+
+    <div class="text-box-title">Какво да направя?</div>
+    <div class="text-box">
+        <ul>
+            <li>Опитайте да отворите страницата по-късно.</li>
+            <li>Свържете се с администратора на сайта и го информирайте за проблема.</li>
+        </ul>
+    </div>
+
+    <br />
+
+    <div class="text-box-title">Начална страница:</div>
+    <a id="homepage-url" href="http://<!--#echo var="HTTP_HOST" -->"><!--#echo var="HTTP_HOST" --></a>
+</body>
+</html>

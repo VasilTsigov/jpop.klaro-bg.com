@@ -1,0 +1,9 @@
+[17-Jul-2014 14:46:21 Europe/Sofia] PHP Parse error:  syntax error, unexpected '}' in /www/klaro-bg.com/jpop/root/users/users_Index_Lavel.php on line 42
+[17-Jul-2014 16:39:11 Europe/Sofia] PHP Parse error:  syntax error, unexpected '}' in /www/klaro-bg.com/jpop/root/users/users_Index_Lavel.php on line 42
+[06-Nov-2014 12:02:06 Europe/Sofia] PHP Fatal error:  Too many connections in /www/klaro-bg.com/jpop/root/Connections/localhost.php on line 9
+[08-Jan-2016 04:02:20 Europe/Sofia] PHP Fatal error:  Can't connect to local MySQL server through socket '/var/lib/mysql/mysql.sock' (11) in /www/klaro-bg.com/jpop/root/Connections/localhost.php on line 9
+[08-Jan-2016 04:03:14 Europe/Sofia] PHP Fatal error:  Can't connect to local MySQL server through socket '/var/lib/mysql/mysql.sock' (11) in /www/klaro-bg.com/jpop/root/Connections/localhost.php on line 9
+[08-Jan-2016 04:03:42 Europe/Sofia] PHP Fatal error:  Can't connect to local MySQL server through socket '/var/lib/mysql/mysql.sock' (11) in /www/klaro-bg.com/jpop/root/Connections/localhost.php on line 9
+[07-Apr-2016 04:14:43 Europe/Sofia] PHP Fatal error:  Too many connections in /www/klaro-bg.com/jpop/root/Connections/localhost.php on line 9
+[07-Apr-2016 04:15:21 Europe/Sofia] PHP Fatal error:  Lost connection to MySQL server at 'waiting for initial communication packet', system error: 95 in /www/klaro-bg.com/jpop/root/Connections/localhost.php on line 9
+[21-Jun-2016 11:25:20 Europe/Sofia] PHP Fatal error:  Too many connections in /www/klaro-bg.com/jpop/root/Connections/localhost.php on line 9

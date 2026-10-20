@@ -1,0 +1,6 @@
+# големи/лични данни – не се версионират
+/files/
+/klarobg_jpop.sql
+/Connections/localhost.php
+*.log
+__pycache__/

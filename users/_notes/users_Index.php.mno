@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_rsUsers" value="name:UserEmail;datatype:string,name:UserFirstName;datatype:string,name:UserLastName;datatype:string,name:UserCity;datatype:string,name:DateRegister;datatype:string,name:UserCountry;datatype:string,name:statusName;datatype:string,name:UserID;datatype:int" />
+	<infoitem key="UD_rsUsersCount" value="name:statusName;datatype:string,name:UsersCout;datatype:int,name:statusUserLave;datatype:int" />
+</info>

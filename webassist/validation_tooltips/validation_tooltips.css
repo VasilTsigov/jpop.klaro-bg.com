@@ -1,0 +1,23 @@
+/* version 1.0.0 */
+
+.WA_SpryValidationTooltip_errorFloat {
+	position: absolute;
+	z-index: 9999;
+}
+.WA_SpryValidationTooltip_errorWrapper {
+	padding-right: 12px;
+	border-style: solid;
+	white-space: nowrap;
+	padding: 10px;
+}
+.WA_SpryValidationTooltip_downArrow {
+	height:1px;
+	border-style: solid;
+}
+
+.WA_SpryValidationTooltip_closeValidation  {
+    position:absolute;
+	font-family: monospace;
+	font-size: smaller;
+	cursor: pointer;
+}

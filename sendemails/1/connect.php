@@ -1,0 +1,1 @@
+<?php//$error = "Неможе да се свърже с базата данни";$connect = mysql_connect("localhost","klarobg_klaop","mysql123@rs19I") or die(mysql_error());mysql_select_db("klarobg_klaop") or die(mysql_error());
