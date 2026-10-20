@@ -11,7 +11,7 @@
     $cur = fn ($url) => url()->current() === $url ? ' aria-current=page' : '';
 @endphp
 <header class="site-header"><div class="bar">
-  <a class="brand" href="{{ url('/') }}"><strong>Journal POP</strong><small>Peer-reviewed journal</small></a>
+  <a class="brand" href="{{ url('/') }}"><img src="{{ asset('images/logo.png') }}" alt="" width="74" height="74"><span><strong>PROPAGATION OF ORNAMENTAL PLANTS</strong><small>Online Manuscript Submission, Review and Tracking System</small></span></a>
   <nav class="nav" aria-label="Main">
     @auth
       <a href="{{ route('welcome') }}"{!! $cur(route('welcome')) !!}>Home</a>
@@ -32,6 +32,7 @@
       <a class="user" href="{{ route('profile') }}"{!! $cur(route('profile')) !!}>{{ auth()->user()->email }}</a>
       <form method="post" action="{{ route('logout') }}">@csrf<button>Log out</button></form>
     @else
+      <a href="{{ route('home') }}"{!! $cur(route('home')) !!}>Home</a>
       <a href="{{ route('login') }}"{!! $cur(route('login')) !!}>Login</a>
       <a href="{{ route('register') }}"{!! $cur(route('register')) !!}>Register</a>
     @endauth
@@ -46,6 +47,6 @@
   @foreach ($errors->all() as $e)<p class="err">{{ $e }}</p>@endforeach
   @yield('content')
 </main>
-<footer class="site-footer">Journal POP</footer>
+<footer class="site-footer">Journal-POP &copy; 2011 - {{ date('Y') }}</footer>
 </body>
 </html>

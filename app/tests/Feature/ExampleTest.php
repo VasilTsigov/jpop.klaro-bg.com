@@ -2,18 +2,21 @@
 
 namespace Tests\Feature;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
-    /**
-     * A basic test example.
-     */
-    public function test_the_application_redirects_guests_to_login(): void
-    {
-        $response = $this->get('/');
+    use RefreshDatabase;
 
-        $response->assertRedirect(route("login"));
+    public function test_guests_see_the_public_home_page(): void
+    {
+        $this->get('/')->assertOk()->assertSee('Online Manuscript Submission, Review and Tracking System');
+    }
+
+    public function test_logged_in_users_go_to_welcome(): void
+    {
+        $this->actingAs(User::factory()->create())->get('/')->assertRedirect(route('welcome'));
     }
 }

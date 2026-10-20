@@ -11,7 +11,7 @@ use App\Http\Controllers\ReviewInvitationController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () => redirect()->route(auth()->check() ? 'welcome' : 'login'));
+Route::get('/', fn () => auth()->check() ? redirect()->route('welcome') : view('pages.home'))->name('home');
 
 Route::middleware('guest')->group(function () {
     Route::get('/users/login', [AuthController::class, 'showLogin'])->name('login');
