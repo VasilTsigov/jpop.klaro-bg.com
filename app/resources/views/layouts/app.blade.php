@@ -41,6 +41,7 @@ textarea{width:100%;box-sizing:border-box}
         <a href="{{ route('editor.list', 'inprogress') }}">All Manuscripts</a>
         <a href="{{ route('editor.list', 'rejected') }}">Rejected</a>
         <a href="{{ route('editor.list', 'published') }}">Published</a>
+        <a href="{{ route('editor.search') }}">Search</a>
       @endif
       <a href="{{ route('profile') }}">{{ auth()->user()->email }}</a>
       <form method="post" action="{{ route('logout') }}">@csrf<button>Log out</button></form>
@@ -48,6 +49,8 @@ textarea{width:100%;box-sizing:border-box}
       <a href="{{ route('login') }}">Login</a>
       <a href="{{ route('register') }}">Register</a>
     @endauth
+    <a href="{{ route('instructions') }}">Instructions</a>
+    <a href="{{ route('contacts') }}">Contact</a>
   </nav>
 </header>
 <main class="@yield('main_class')">

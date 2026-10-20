@@ -4,9 +4,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EditorController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\ManuscriptController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewerController;
 use App\Http\Controllers\ReviewInvitationController;
+use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => redirect()->route(auth()->check() ? 'welcome' : 'login'));
@@ -29,7 +31,17 @@ Route::get('/users/thank-you', fn () => view('auth.thank-you'))->name('thank-you
 Route::get('/review/{token}', [ReviewInvitationController::class, 'show'])->name('review.respond');
 Route::post('/review/{token}', [ReviewInvitationController::class, 'respond'])->middleware('throttle:30,1');
 
+// Public helper pages (old instructions/, issues/, contacts/)
+Route::get('/instructions', [PageController::class, 'instructions'])->name('instructions');
+Route::get('/instructions/consent', [PageController::class, 'consent'])->name('instructions.consent');
+Route::get('/issues', [PageController::class, 'issues'])->name('issues');
+Route::get('/contacts', [PageController::class, 'contactForm'])->name('contacts');
+Route::post('/contacts', [PageController::class, 'contactSend'])->middleware('throttle:5,1');
+Route::get('/contacts/thank-you', fn () => view('pages.contacts-thanks'))->name('contacts.thanks');
+
 Route::middleware('auth')->group(function () {
+    Route::get('/manuscripts/{manuscript}/{what}', [PageController::class, 'text'])
+        ->whereNumber('manuscript')->where('what', 'abstract|cover-letter')->name('manuscripts.text');
     Route::post('/users/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/users/welcome', fn () => view('auth.welcome'))->name('welcome');
     Route::get('/manuscripts', [ManuscriptController::class, 'index'])->name('manuscripts.index');
@@ -53,6 +65,7 @@ Route::middleware('auth')->group(function () {
 
     // Editorial desk – editors only (ManuscriptPolicy::editorial)
     Route::middleware('can:editorial,App\Models\Manuscript')->prefix('editor')->group(function () {
+        Route::get('/search', [SearchController::class, 'index'])->name('editor.search');
         Route::get('/lists/{list}', [EditorController::class, 'index'])->where('list', 'inprogress|rejected|published')->name('editor.list');
         Route::prefix('manuscripts/{manuscript}')->whereNumber('manuscript')->group(function () {
             Route::get('/reviewers/{slot}', [EditorController::class, 'assignForm'])->whereIn('slot', [1, 2, 3])->name('editor.assign');

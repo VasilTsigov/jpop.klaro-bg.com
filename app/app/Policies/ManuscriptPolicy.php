@@ -46,6 +46,20 @@ class ManuscriptPolicy
         return $user->role === 'reviewer' && $review->reviewer_id === $user->id && $review->confirmed_state !== 'declined';
     }
 
+    /**
+     * Abstract and cover letter pages. The old pages showed them to any logged-in user for any id;
+     * now: editor, the manuscript's author, or a reviewer assigned to it (not declined).
+     */
+    public function viewText(User $user, Manuscript $manuscript): bool
+    {
+        return match ($user->role) {
+            'editor' => true,
+            'author' => $manuscript->author_id === $user->id,
+            'reviewer' => $manuscript->reviews()->where('reviewer_id', $user->id)->where('confirmed_state', '!=', 'declined')->exists(),
+            default => false,
+        };
+    }
+
     public function downloadFile(User $user, Manuscript $manuscript, ManuscriptFile $file): bool
     {
         if ($file->manuscript_id !== $manuscript->id) {
