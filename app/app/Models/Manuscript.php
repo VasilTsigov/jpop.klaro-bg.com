@@ -13,6 +13,20 @@ class Manuscript extends Model
 
     protected $guarded = [];
 
+    protected function casts(): array
+    {
+        return [
+            'submitted_at' => 'datetime', 'corrected_at' => 'datetime', 'editor_letter_at' => 'datetime',
+            'proof_at' => 'datetime', 'proof_editor_at' => 'datetime',
+        ];
+    }
+
+    /** "JPOP"+code, the same value the old mscrCodeU column held. */
+    public function getCodeLabelAttribute(): string
+    {
+        return 'JPOP'.$this->code;
+    }
+
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'author_id');

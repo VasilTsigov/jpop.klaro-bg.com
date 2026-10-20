@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\ManuscriptController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +25,13 @@ Route::get('/users/thank-you', fn () => view('auth.thank-you'))->name('thank-you
 Route::middleware('auth')->group(function () {
     Route::post('/users/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/users/welcome', fn () => view('auth.welcome'))->name('welcome');
+    Route::get('/manuscripts', [ManuscriptController::class, 'index'])->name('manuscripts.index');
+    Route::get('/manuscripts/submit', [ManuscriptController::class, 'create'])->name('manuscripts.create');
+    Route::post('/manuscripts/submit', [ManuscriptController::class, 'store'])->name('manuscripts.store');
+    Route::get('/manuscripts/{manuscript}/corrected', [ManuscriptController::class, 'showCorrected'])->whereNumber('manuscript')->name('manuscripts.corrected');
+    Route::post('/manuscripts/{manuscript}/corrected', [ManuscriptController::class, 'storeCorrected'])->whereNumber('manuscript');
+    Route::get('/manuscripts/{manuscript}/figures', [ManuscriptController::class, 'showFigures'])->whereNumber('manuscript')->name('manuscripts.figures');
+    Route::post('/manuscripts/{manuscript}/figures', [ManuscriptController::class, 'storeCorrectedFigures'])->whereNumber('manuscript');
     Route::get('/files/{file}', [FileController::class, 'show'])->whereNumber('file')->name('files.show');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
     Route::post('/profile', [ProfileController::class, 'update']);

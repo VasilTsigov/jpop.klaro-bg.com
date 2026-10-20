@@ -18,6 +18,18 @@ class ManuscriptPolicy
     /** Editor's letters and proofs are exchanged between editor and author only. */
     private const AUTHOR_SIDE = ['editor_letter', 'proof', 'proof_letter'];
 
+    /** Submit a new manuscript / list one's own (plan §4: authors only). */
+    public function submit(User $user): bool
+    {
+        return $user->role === 'author';
+    }
+
+    /** Corrected manuscript and corrected figures: only the manuscript's own author. */
+    public function correct(User $user, Manuscript $manuscript): bool
+    {
+        return $user->role === 'author' && $manuscript->author_id === $user->id;
+    }
+
     public function downloadFile(User $user, Manuscript $manuscript, ManuscriptFile $file): bool
     {
         if ($file->manuscript_id !== $manuscript->id) {
