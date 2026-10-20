@@ -16,6 +16,9 @@ return [
 
     'default' => env('MAIL_MAILER', 'log'),
 
+    // Test server only: redirect ALL outgoing mail to this address (see docs/06-staging.md).
+    'redirect_to' => env('MAIL_REDIRECT_TO'),
+
     /*
     |--------------------------------------------------------------------------
     | Mailer Configurations
