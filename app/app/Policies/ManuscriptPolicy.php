@@ -18,6 +18,15 @@ class ManuscriptPolicy
     /** Editor's letters and proofs are exchanged between editor and author only. */
     private const AUTHOR_SIDE = ['editor_letter', 'proof', 'proof_letter'];
 
+    /**
+     * Editorial desk: lists, reviewers, reminders, decision, status, proof. Editors only
+     * (the old mscr_Status / mscr_DirectReject pages had no guard at all – see docs/02-characterization.md).
+     */
+    public function editorial(User $user): bool
+    {
+        return $user->role === 'editor';
+    }
+
     /** Submit a new manuscript / list one's own (plan §4: authors only). */
     public function submit(User $user): bool
     {

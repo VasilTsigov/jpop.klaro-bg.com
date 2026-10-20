@@ -23,6 +23,9 @@ class ManuscriptUploads
         'corrected_manuscript' => ['corrected', '(corrected)'],
         'corrected_photo' => ['photographs', '_photo{n}(corrected)'],
         'corrected_graph' => ['graphs', '_graph{n}(corrected)'],
+        'editor_letter' => ['editletter', '_editor_letter'],
+        'proof' => ['proof', '_proof'],
+        'proof_letter' => ['editletter', '_proof_letter'],
     ];
 
     /** @var list<string> paths written during this request, removed again if the request fails */

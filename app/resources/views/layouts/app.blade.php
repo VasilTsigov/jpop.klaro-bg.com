@@ -19,6 +19,8 @@ table.ms th{background:#feed77}
 label{display:block;margin-top:12px;font-weight:bold}
 input[type=text],input[type=email],input[type=password],textarea{width:100%;padding:6px;box-sizing:border-box}
 .btn{margin-top:16px;padding:8px 18px;background:#1f3a5f;color:#fff;border:0;cursor:pointer}
+.btn.small{margin:0;padding:2px 8px}
+textarea{width:100%;box-sizing:border-box}
 .err{color:#b00020;margin:6px 0}.ok{color:#146c2e;margin:6px 0}
 </style>
 </head>
@@ -31,6 +33,11 @@ input[type=text],input[type=email],input[type=password],textarea{width:100%;padd
       @if (auth()->user()->role === 'author')
         <a href="{{ route('manuscripts.create') }}">Submit Manuscripts</a>
         <a href="{{ route('manuscripts.index') }}">Manuscripts</a>
+      @endif
+      @if (auth()->user()->role === 'editor')
+        <a href="{{ route('editor.list', 'inprogress') }}">All Manuscripts</a>
+        <a href="{{ route('editor.list', 'rejected') }}">Rejected</a>
+        <a href="{{ route('editor.list', 'published') }}">Published</a>
       @endif
       <a href="{{ route('profile') }}">{{ auth()->user()->email }}</a>
       <form method="post" action="{{ route('logout') }}">@csrf<button>Log out</button></form>

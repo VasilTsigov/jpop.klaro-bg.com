@@ -27,6 +27,14 @@ class Manuscript extends Model
         return 'JPOP'.$this->code;
     }
 
+    /** LEGACY colorRecommendation(): red when at least two reviewers recommend "Rejected", otherwise yellow. */
+    public function getRecommendationColorAttribute(): string
+    {
+        $rejected = $this->reviews->where('recommendation', 'Rejected')->count();
+
+        return $rejected >= 2 ? '#FF0000' : '#FEED77';
+    }
+
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'author_id');
