@@ -33,11 +33,11 @@ class AdminTest extends TestCase
     public function test_editor_sees_the_menu_and_the_user_list_with_role_filter(): void
     {
         $editor = User::factory()->create(['role' => 'editor']);
-        User::factory()->create(['role' => 'reviewer', 'email' => 'rev@example.com']);
+        User::factory()->create(['role' => 'reviewer', 'email' => 'rev@example.com', 'registered_at' => '2011-05-19 00:09:41']);
         User::factory()->create(['role' => 'author', 'email' => 'aut@example.com']);
 
         $this->actingAs($editor)->get('/editor/users')
-            ->assertOk()->assertSee('All Users - 3')->assertSee('rev@example.com')->assertSee('aut@example.com')
+            ->assertOk()->assertSee('All Users - 3')->assertSee('19.05.2011')->assertSee('rev@example.com')->assertSee('aut@example.com')
             ->assertSee('href="'.route('editor.logs').'"', false);
         $this->get('/editor/users?role=reviewer')->assertOk()->assertSee('rev@example.com')->assertDontSee('aut@example.com');
         $this->get('/editor/users?role=admin')->assertNotFound();
