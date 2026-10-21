@@ -51,5 +51,5 @@
 @empty
   <p>You have no manuscripts for review.</p>
 @endforelse
-{{ $reviews->links('pagination::simple-default') }}
+{{ $reviews->links() }}
 @endsection

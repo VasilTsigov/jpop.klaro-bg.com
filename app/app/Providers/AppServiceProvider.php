@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\ManuscriptReview;
 use App\Policies\ManuscriptPolicy;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
@@ -25,6 +26,8 @@ class AppServiceProvider extends ServiceProvider
     {
         // one policy for the manuscript and its review slots
         Gate::policy(ManuscriptReview::class, ManuscriptPolicy::class);
+
+        Paginator::defaultView('pagination.jpop');
 
         // Test server with real imported addresses: every mail goes to this one address instead.
         if ($to = config('mail.redirect_to')) {

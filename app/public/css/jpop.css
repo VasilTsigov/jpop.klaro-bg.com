@@ -140,3 +140,11 @@ main form p{color:var(--muted);font-size:14px}
 select{appearance:auto}
 input[type=file]{padding:8px;border:1px dashed var(--line);border-radius:6px;width:100%;background:var(--bg)}
 label+small,.hint{display:block;color:var(--muted);font-size:13px;font-weight:400}
+
+/* pagination */
+.pager{display:flex;flex-wrap:wrap;gap:4px;margin:16px 0}
+.pager a,.pager span{padding:4px 10px;border:1px solid var(--line);border-radius:6px;text-decoration:none;background:var(--card)}
+.pager .cur{background:var(--brand-2);border-color:var(--brand-2);color:#fff;font-weight:600}
+.pager .off{color:var(--muted)}
+.role-filter{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 0 14px}
+.role-filter .cur{font-weight:700}

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EditorController;
 use App\Http\Controllers\FileController;
@@ -66,6 +67,10 @@ Route::middleware('auth')->group(function () {
     // Editorial desk – editors only (ManuscriptPolicy::editorial)
     Route::middleware('can:editorial,App\Models\Manuscript')->prefix('editor')->group(function () {
         Route::get('/search', [SearchController::class, 'index'])->name('editor.search');
+        Route::get('/users', [AdminController::class, 'users'])->name('editor.users');
+        Route::get('/users/{user}', [AdminController::class, 'user'])->whereNumber('user')->name('editor.user');
+        Route::post('/users/{user}/role', [AdminController::class, 'role'])->whereNumber('user')->name('editor.user.role');
+        Route::get('/logs', [AdminController::class, 'logs'])->name('editor.logs');
         Route::get('/lists/{list}', [EditorController::class, 'index'])->where('list', 'inprogress|rejected|published')->name('editor.list');
         Route::prefix('manuscripts/{manuscript}')->whereNumber('manuscript')->group(function () {
             Route::get('/reviewers/{slot}', [EditorController::class, 'assignForm'])->whereIn('slot', [1, 2, 3])->name('editor.assign');

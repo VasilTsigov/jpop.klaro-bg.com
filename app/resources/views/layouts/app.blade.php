@@ -35,6 +35,8 @@
         <a href="{{ route('editor.list', 'rejected') }}"{!! $cur(route('editor.list', 'rejected')) !!}>Rejected</a>
         <a href="{{ route('editor.list', 'published') }}"{!! $cur(route('editor.list', 'published')) !!}>Published</a>
         <a href="{{ route('editor.search') }}"{!! $cur(route('editor.search')) !!}>Search</a>
+        <a href="{{ route('editor.users') }}"{!! $cur(route('editor.users')) !!}>Users</a>
+        <a href="{{ route('editor.logs') }}"{!! $cur(route('editor.logs')) !!}>Logs</a>
       @endif
     @else
       <a href="{{ route('home') }}"{!! $cur(route('home')) !!}>Home</a>

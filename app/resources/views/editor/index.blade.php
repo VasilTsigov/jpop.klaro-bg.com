@@ -102,5 +102,5 @@
 @empty
   <p>No manuscripts</p>
 @endforelse
-{{ $manuscripts->links('pagination::simple-default') }}
+{{ $manuscripts->links() }}
 @endsection

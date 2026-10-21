@@ -24,6 +24,6 @@
   @empty
     <p class="err">No search result</p>
   @endforelse
-  {{ $manuscripts->links('pagination::simple-default') }}
+  {{ $manuscripts->links() }}
 @endif
 @endsection

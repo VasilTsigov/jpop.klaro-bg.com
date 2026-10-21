@@ -57,5 +57,5 @@
 @empty
   <p>You have no manuscripts yet. <a href="{{ route('manuscripts.create') }}">Submit a manuscript</a>.</p>
 @endforelse
-{{ $manuscripts->links('pagination::simple-default') }}
+{{ $manuscripts->links() }}
 @endsection
