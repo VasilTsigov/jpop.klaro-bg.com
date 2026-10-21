@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules\Password as PasswordRule;
@@ -42,16 +43,8 @@ class ProfileController extends Controller
         return back()->with('status', 'Password changed.');
     }
 
-    /** Same activity_log rows the old pages wrote (logID is not auto-increment in the new schema). */
     private function log(Request $request, string $content): void
     {
-        $u = $request->user();
-        DB::table('activity_log')->insert([
-            'id' => (int) DB::table('activity_log')->max('id') + 1,
-            'user' => "{$u->first_name} {$u->last_name}, {$u->email}",
-            'ip' => (string) $request->ip(),
-            'content' => $content,
-            'logged_at' => now(),
-        ]);
+        ActivityLog::write($request, $content);
     }
 }

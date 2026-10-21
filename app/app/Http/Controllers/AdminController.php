@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Support\ActivityLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Editors' administration (old users/users_Index*, users_ChangeStatus, profile_Users, Logos/logos_Index):
@@ -51,10 +53,57 @@ class AdminController extends Controller
         return back()->with('status', 'Role changed.');
     }
 
-    public function logs()
+    public function logs(Request $request)
     {
-        $logs = DB::table('activity_log')->orderByDesc('id')->paginate(50);
+        $f = $request->validate([
+            'category' => ['nullable', Rule::in(array_keys(ActivityLog::CATEGORIES))],
+            'level' => ['nullable', Rule::in(ActivityLog::LEVELS)],
+            'user' => 'nullable|string|max:100',
+            'manuscript' => 'nullable|integer|min:1',
+            'from' => 'nullable|date',
+            'to' => 'nullable|date',
+            'q' => 'nullable|string|max:100',
+        ]);
+        $query = $this->logQuery($f);
 
-        return view('editor.logs', compact('logs'));
+        if ($request->query('export') === 'csv') {
+            return $this->exportLogs($query);
+        }
+
+        $logs = $query->paginate(50)->withQueryString();
+        $categories = ActivityLog::CATEGORIES;
+
+        return view('editor.logs', compact('logs', 'f', 'categories'));
+    }
+
+    private function logQuery(array $f)
+    {
+        $like = fn (string $v) => '%'.addcslashes($v, '%_\\').'%';
+
+        return DB::table('activity_log')
+            ->when($f['category'] ?? null, fn ($q, $v) => $q->where('category', $v))
+            ->when($f['level'] ?? null, fn ($q, $v) => $q->where('level', $v))
+            ->when($f['user'] ?? null, fn ($q, $v) => $q->where('user', 'like', $like($v)))
+            ->when($f['manuscript'] ?? null, fn ($q, $v) => $q->where('manuscript_id', $v))
+            ->when($f['from'] ?? null, fn ($q, $v) => $q->where('logged_at', '>=', Carbon::parse($v)->startOfDay()))
+            ->when($f['to'] ?? null, fn ($q, $v) => $q->where('logged_at', '<=', Carbon::parse($v)->endOfDay()))
+            ->when($f['q'] ?? null, fn ($q, $v) => $q->where('content', 'like', $like($v)))
+            ->orderByDesc('id');
+    }
+
+    /** The filtered view as CSV (capped, so that an unfiltered export cannot exhaust the server). */
+    private function exportLogs($query): StreamedResponse
+    {
+        return response()->streamDownload(function () use ($query) {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, ['id', 'time', 'category', 'level', 'user', 'role', 'ip', 'action', 'manuscript', 'method', 'url', 'status', 'context']);
+            // cells that start like a formula are prefixed, so that a spreadsheet does not run them
+            $safe = fn ($v) => is_string($v) && preg_match('/^[=+\-@\t\r]/', $v) ? "'".$v : $v;
+            foreach ((clone $query)->limit(50000)->cursor() as $l) {
+                fputcsv($out, array_map($safe, [$l->id, $l->logged_at, $l->category, $l->level, $l->user, $l->role, $l->ip, $l->content,
+                    $l->manuscript_id, $l->method, $l->url, $l->status, $l->context]));
+            }
+            fclose($out);
+        }, 'jpop-logs-'.now()->format('Ymd-His').'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 }

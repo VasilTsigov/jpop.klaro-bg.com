@@ -28,6 +28,7 @@ class EditorialMail
             $seen[strtolower($address)] = true;
             try {
                 Mail::to($address)->send(clone $letter);
+                ActivityLog::event('mail', "Mail to $address: {$letter->mailSubject}", 'info', ['to' => $address, 'subject' => $letter->mailSubject]);
             } catch (\Throwable $e) {
                 report($e);
                 $ok = false;
@@ -42,6 +43,8 @@ class EditorialMail
     {
         try {
             Mail::to($to)->send($mailable);
+            $subject = $mailable->envelope()->subject ?? class_basename($mailable);
+            ActivityLog::event('mail', 'Mail to '.implode(', ', (array) $to).": $subject", 'info', ['to' => (array) $to, 'subject' => $subject]);
 
             return true;
         } catch (\Throwable $e) {

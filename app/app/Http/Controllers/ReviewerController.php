@@ -75,7 +75,7 @@ class ReviewerController extends Controller
         }
         $uploads->commit();
 
-        ActivityLog::write($request, "Reviewer {$review->slot} uploads file");
+        ActivityLog::upload($request, "Reviewer {$review->slot} uploads file", $manuscript->id);
         $this->notify($review->refresh());
 
         return redirect()->route('reviews.index')->with('status', 'Thank you! Your review has been uploaded.');

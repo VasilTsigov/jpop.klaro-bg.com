@@ -74,7 +74,7 @@ class AdminTest extends TestCase
             DB::table('activity_log')->insert(['id' => $i, 'user' => 'U', 'ip' => '1.2.3.4', 'content' => "Action $i", 'logged_at' => now()]);
         }
 
-        $this->actingAs($editor)->get('/editor/logs')->assertOk()->assertSee('Action 55')->assertSee('Action 6<', false)->assertDontSee('Action 5<', false)->assertSee('page=2');
-        $this->get('/editor/logs?page=2')->assertOk()->assertSee('Action 5<', false);
+        $this->actingAs($editor)->get('/editor/logs')->assertOk()->assertSee('Action 55')->assertSee('<td>6.</td>', false)->assertDontSee('<td>5.</td>', false)->assertSee('page=2');
+        $this->get('/editor/logs?page=2')->assertOk()->assertSee('<td>5.</td>', false);
     }
 }

@@ -8,4 +8,6 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 // Shared hosting: cron runs `php artisan schedule:run` every minute; this drains the mail queue.
+// Activity journal retention (docs/03-plan.md §9)
+Schedule::command('jpop:logs:prune')->dailyAt('03:30');
 Schedule::command('queue:work --stop-when-empty --max-time=50 --tries=3')->everyMinute()->withoutOverlapping();

@@ -85,7 +85,7 @@ class EditorController extends Controller
             return $review;
         });
 
-        ActivityLog::write($request, "Send To Reviewer No $slot");
+        ActivityLog::write($request, "Send To Reviewer No $slot", manuscriptId: $manuscript->id);
         $sent = $this->invite($review->load('manuscript'), $reviewer);
 
         return redirect()->route('editor.list', 'inprogress')->with('status', $sent
@@ -100,7 +100,7 @@ class EditorController extends Controller
         $review = $manuscript->reviews()->with('reviewer')->where('slot', $slot)->firstOrFail();
         abort_unless($review->reviewer && $review->confirmed_state === 'pending' && (int) $manuscript->status === 0, 404);
 
-        ActivityLog::write($request, "Resend invitation to Reviewer No $slot");
+        ActivityLog::write($request, "Resend invitation to Reviewer No $slot", manuscriptId: $manuscript->id);
         $sent = $this->invite($review, $review->reviewer);
 
         return back()->with('status', $sent ? 'Invitation sent again.' : 'The invitation e-mail could not be sent.');
@@ -130,7 +130,7 @@ class EditorController extends Controller
             strip_tags($data['reminder'], self::ALLOWED_TAGS),
         ));
         $this->event($manuscript, 'reminder_sent', ['slot' => $slot]);
-        ActivityLog::write($request, "Reminder to Reviewer No $slot");
+        ActivityLog::write($request, "Reminder to Reviewer No $slot", manuscriptId: $manuscript->id);
 
         return redirect()->route('editor.list', 'inprogress')->with('status', 'Reminder sent.');
     }
@@ -156,7 +156,7 @@ class EditorController extends Controller
             return $f;
         });
 
-        ActivityLog::write($request, "Upload Editor's Decision Comments");
+        ActivityLog::upload($request, "Upload Editor's Decision Comments", $manuscript->id);
         $author = $manuscript->author;
         EditorialMail::send($author->email, new EditorialLetter(
             'Journal POP - Letter from the editor',
@@ -178,7 +178,7 @@ class EditorController extends Controller
         Gate::authorize('manageReview', $manuscript);
         $manuscript->update(['status' => 1]);
         $this->event($manuscript, 'rejected_directly');
-        ActivityLog::write($request, 'Direct Reject');
+        ActivityLog::write($request, 'Direct Reject', manuscriptId: $manuscript->id);
 
         $author = $manuscript->author;
         EditorialMail::send($author->email, new EditorialLetter(
@@ -211,7 +211,7 @@ class EditorController extends Controller
         $data = $request->validate(['status' => 'required|in:0,1,2']);
         $manuscript->update(['status' => (int) $data['status']]);
         $this->event($manuscript, 'status_changed', ['status' => (int) $data['status']]);
-        ActivityLog::write($request, 'Change Status');
+        ActivityLog::write($request, 'Change Status', manuscriptId: $manuscript->id);
 
         // LEGACY: waue_mscr_Status_1/2 (Rejected/Published) exist but the old page never sent them
         return back()->with('status', 'Status changed.');
@@ -239,7 +239,7 @@ class EditorController extends Controller
             $sent++;
         }
         $this->event($manuscript, 'letters_to_reviewers', ['count' => $sent]);
-        ActivityLog::write($request, 'Send Letters to Reviewers');
+        ActivityLog::write($request, 'Send Letters to Reviewers', manuscriptId: $manuscript->id);
 
         return back()->with('status', "Letters sent to $sent reviewer(s).");
     }
@@ -266,7 +266,7 @@ class EditorController extends Controller
             return [$proof, $letter];
         });
 
-        ActivityLog::write($request, 'Upload Proof File');
+        ActivityLog::upload($request, 'Upload Proof File', $manuscript->id);
         $author = $manuscript->author;
         EditorialMail::send($author->email, new EditorialLetter(
             'Journal POP - Proof File',

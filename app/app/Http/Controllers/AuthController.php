@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\ConfirmRegistration;
 use App\Models\User;
+use App\Support\ActivityLog;
 use App\Support\EditorialMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,14 +31,17 @@ class AuthController extends Controller
         $user = $candidates->first(fn (User $u) => $this->passwordMatches($u, $data['password']));
 
         if (! $user) {
+            ActivityLog::event('auth', 'Login failed: wrong email or password', 'warning', ['email' => Str::limit($data['email'], 100, '')], null, null, $request);
             throw ValidationException::withMessages(['email' => 'Wrong email or password.']);
         }
         if (! $user->email_verified_at) {
+            ActivityLog::event('auth', 'Login refused: registration not confirmed', 'warning', ['email' => $user->email], null, $user, $request);
             throw ValidationException::withMessages(['email' => 'Please confirm your registration first (see the email we sent you).']);
         }
 
         Auth::login($user);
         $request->session()->regenerate();
+        ActivityLog::event('auth', 'Login', 'info', [], null, $user, $request);
 
         return redirect()->intended(route('welcome'));
     }
@@ -60,6 +64,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        ActivityLog::event('auth', 'Logout', 'info', [], null, null, $request);
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
@@ -103,6 +108,7 @@ class AuthController extends Controller
             return $user;
         });
 
+        ActivityLog::event('auth', 'Registration', 'info', ['email' => $user->email], null, $user, $request);
         EditorialMail::deliver($user->email, new ConfirmRegistration($user));
 
         return redirect()->route('thank-you');
@@ -123,6 +129,8 @@ class AuthController extends Controller
             'verification_code' => Str::random(20),
         ])->save();
 
+        ActivityLog::event('auth', 'Registration confirmed', 'info', [], null, $user, $request);
+
         return view('auth.confirmed');
     }
 
@@ -136,6 +144,7 @@ class AuthController extends Controller
     {
         $request->validate(['email' => 'required|email']);
         Password::sendResetLink($request->only('email'));
+        ActivityLog::event('auth', 'Password reset requested', 'info', ['email' => Str::limit((string) $request->input('email'), 100, '')], null, null, $request);
 
         // same answer whether the address exists or not
         return back()->with('status', 'If this email is registered, a link to set a new password was sent to it.');
@@ -156,6 +165,7 @@ class AuthController extends Controller
 
         $status = Password::reset($data + ['password_confirmation' => $request->password_confirmation], function (User $user, string $password) {
             $user->forceFill(['password' => $password, 'legacy_sha1' => null])->save();
+            ActivityLog::event('auth', 'Password reset', 'info', [], null, $user);
         });
 
         if ($status !== Password::PASSWORD_RESET) {

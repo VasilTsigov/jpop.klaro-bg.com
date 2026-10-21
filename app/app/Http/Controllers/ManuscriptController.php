@@ -81,7 +81,7 @@ class ManuscriptController extends Controller
         }
         $uploads->commit();
 
-        ActivityLog::write($request, 'Submit manuscript');
+        ActivityLog::upload($request, 'Submit manuscript', $manuscript->id);
         EditorialMail::deliver($user->email, new SubmissionReceived($user, $manuscript));
         EditorialMail::deliver(EditorRecipients::emails(), new SubmissionNotice($user, $manuscript));
 
@@ -112,7 +112,7 @@ class ManuscriptController extends Controller
         }
         $uploads->commit();
 
-        ActivityLog::write($request, 'Upload Corrected File');
+        ActivityLog::upload($request, 'Upload Corrected File', $manuscript->id);
         EditorialMail::deliver(EditorRecipients::emails(), new CorrectedUploaded($request->user(), $manuscript));
 
         return redirect()->route('manuscripts.index')->with('status', 'Corrected manuscript uploaded.');
@@ -142,7 +142,7 @@ class ManuscriptController extends Controller
         }
         $uploads->commit();
 
-        ActivityLog::write($request, 'Submit corrected figurs');
+        ActivityLog::upload($request, 'Submit corrected figurs', $manuscript->id);
 
         return redirect()->route('manuscripts.index')->with('status', 'Corrected figures uploaded.');
     }

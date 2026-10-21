@@ -11,8 +11,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->web(append: [\App\Http\Middleware\LogActivity::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // unhandled errors (and failed mail) also go to the editors' journal; the default reporting continues
+        $exceptions->report(function (\Throwable $e) {
+            \App\Support\ActivityLog::exception($e);
+        });
     })->create();
