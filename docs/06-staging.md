@@ -100,3 +100,16 @@ chmod -R u+rwX storage bootstrap/cache
 ## Риск/бележки
 - Реални данни на чужд (shared) хостинг → basic auth е задължителен, а копията се изтриват след теста.
 - `Mail::alwaysTo` пренасочва и CC/BCC; оригиналният получател се губи – при нужда от проверка кой е получател се гледа `storage/logs`/activity_log.
+
+## Резултат от реалното пускане (2026-10-21)
+Пуснато на `test.klaro-bg.com` (cPanel, акаунт `klarobg`, MariaDB 10.11). Старият сайт е в `~/sub_domain/jpop.klaro-bg.com/root`, `files/` (6.4 GB, 11751 файла) е там и се ползва директно като `JPOP_LEGACY_FILES` (без копиране, само четене). Квота 50 GB (свободни ~28).
+
+Какво се оказа различно от плана (важи и за продукцията):
+- **PHP:** `php` в неинтерактивен `bash` е 8.3; трябва `export PATH=/opt/cpanel/ea-php84/root/usr/bin:$PATH` (и за cron – пълен път до `ea-php84/.../php`). Composer: `php $(which composer) install --no-dev -o`.
+- **InnoDB:** базите на хостинга са по подразбиране MyISAM → `1071 Specified key was too long`. Поправено в `config/database.php` (`'engine' => env('DB_ENGINE','InnoDB')`).
+- **Имена на бази:** с префикс `klarobg_`, чувствителни към регистъра.
+- **Дъмп:** взет директно от стария сайт с `mysqldump --single-transaction --no-tablespaces` (паролата се чете от `Connections/localhost.php`, не се показва); ~5.8 MB, 6 таблици.
+- **Броеве след импорта:** users 1164, manuscripts 1347, status=1 → 1121 (както в репетицията); `activity_log` 7243 и файлове в БД 8669, липсващи 213 – свежият дъмп е по-нов от репетицията, затова твърдите числа в `deploy/rehearsal.sh` (7217) не важат за него.
+- **`jpop:files`** отказва при `from == to` (файловете вече са на място) – проверката е броят `missing_file` в `storage/app/import-report.csv`.
+- **Защита:** basic auth (`public/.htaccess`, оригиналът е в `~/test.klaro-bg.com/htaccess.orig`) + noindex; cron `schedule:run` добавен; `MAIL_MAILER=log`, `MAIL_REDIRECT_TO` зададен.
+- **Терминал:** при поставяне на много редове се губят нови редове и `read` поглъща следващите – скриптовете се записват във файл с `cat > f <<'END'` и после се пускат; без `curl` (забранен) – проверка с `php -r get_headers`.
