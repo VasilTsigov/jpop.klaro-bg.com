@@ -113,3 +113,23 @@ chmod -R u+rwX storage bootstrap/cache
 - **`jpop:files`** отказва при `from == to` (файловете вече са на място) – проверката е броят `missing_file` в `storage/app/import-report.csv`.
 - **Защита:** basic auth (`public/.htaccess`, оригиналът е в `~/test.klaro-bg.com/htaccess.orig`) + noindex; cron `schedule:run` добавен; `MAIL_MAILER=log`, `MAIL_REDIRECT_TO` зададен.
 - **Терминал:** при поставяне на много редове се губят нови редове и `read` поглъща следващите – скриптовете се записват във файл с `cat > f <<'END'` и после се пускат; без `curl` (забранен) – проверка с `php -r get_headers`.
+
+## 7. Пускане с git (от 2026-10-21)
+Вместо `scp` на архив: локално `git push test main`, на сървъра bare репо + `post-receive`, който пуска `deploy.sh`. Деплойват се само промените в `app/`; `.env`, `vendor/`, `storage/` и файловете не се пипат.
+
+**Еднократна настройка на сървъра** (скриптове през `cat > f <<'END'`, както по-горе):
+```
+export PATH=/opt/cpanel/ea-php84/root/usr/bin:$PATH
+mkdir -p ~/repos && git init --bare ~/repos/jpop.git
+# basic auth: първите редове на сегашния public/.htaccess (AuthType … Require valid-user + Header X-Robots-Tag) – в отделен файл
+head -n <N> ~/test.klaro-bg.com/app/public/.htaccess > ~/test.klaro-bg.com/htaccess.auth
+```
+След първия `git push test main` (hook-ът още не е на място, затова само качва):
+```
+cd ~/repos/jpop.git
+git show main:app/deploy/deploy.sh > ~/test.klaro-bg.com/deploy.sh && chmod +x ~/test.klaro-bg.com/deploy.sh
+git show main:app/deploy/post-receive > hooks/post-receive && chmod +x hooks/post-receive
+~/test.klaro-bg.com/deploy.sh      # първото пускане на ръка
+```
+**Локално (еднократно):** `git remote add test ssh://klarobg@<хост>:<порт>/home/klarobg/repos/jpop.git` (ключ `~/.ssh/jpop`).
+**Всяко пускане:** `git push test main` – в изхода се виждат стъпките на `deploy.sh`. Откат: `git push test <стар-комит>:main --force`.

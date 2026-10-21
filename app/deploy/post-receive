@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Installed as ~/repos/jpop.git/hooks/post-receive on the test server (see docs/06-staging.md §7).
+# Deploys only the `main` branch.
+set -euo pipefail
+while read -r _old _new ref; do
+  [ "$ref" = "refs/heads/main" ] || { echo "skip $ref (only main is deployed)"; exit 0; }
+done
+exec "$HOME/test.klaro-bg.com/deploy.sh"
