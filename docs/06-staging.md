@@ -131,5 +131,5 @@ git show main:app/deploy/deploy.sh > ~/test.klaro-bg.com/deploy.sh && chmod +x ~
 git show main:app/deploy/post-receive > hooks/post-receive && chmod +x hooks/post-receive
 ~/test.klaro-bg.com/deploy.sh      # първото пускане на ръка
 ```
-**Локално (еднократно):** `git remote add test ssh://klarobg@<хост>:<порт>/home/klarobg/repos/jpop.git` (ключ `~/.ssh/jpop`).
+**Локално (еднократно):** `git remote add test ssh://klarobg@leda.superhosting.bg:1022/home/klarobg/repos/jpop.git` (ключ `~/.ssh/jpop`).
 **Всяко пускане:** `git push test main` – в изхода се виждат стъпките на `deploy.sh`. Откат: `git push test <стар-комит>:main --force`.
