@@ -5,15 +5,15 @@
 Дата на теста: ________  Версия (git): ________ (`git log -1` / последният push)
 
 ## A. Настройки преди началото
-- [ ] Пуснат е последният код (комит „Logs v2“ и по-нов): `git push test main` работи (или ръчно качване). Ако не – еднократната настройка от `06-staging.md` §7 още е на ред.
-- [ ] `php artisan migrate --status` – миграциите до `2026_10_21_000001_extend_activity_log` са пуснати (без тях Logs v2 дава 500).
+- [x] Пуснат е последният код (комит „Logs v2“ и по-нов): `git push test main` работи (или ръчно качване). Ако не – еднократната настройка от `06-staging.md` §7 още е на ред. — 2026-10-28, 016f891, push работи
+- [x] `php artisan migrate --status` – миграциите до `2026_10_21_000001_extend_activity_log` са пуснати (без тях Logs v2 дава 500). — всички пуснати
 - [ ] Домейнът е на PHP 8.4 (MultiPHP Manager), basic auth работи (без парола → 401), `X-Robots-Tag: noindex`.
-- [ ] `.env`: `APP_ENV=staging`, `APP_DEBUG=false`, `MAIL_REDIRECT_TO` е зададен (проверка: `php artisan tinker --execute="echo config('mail.redirect_to');"`).
-- [ ] **Поща:** създадена пощенска кутия `test@klaro-bg.com` (cPanel → Email Accounts), `.env`: `MAIL_MAILER=smtp`, `MAIL_HOST`/`MAIL_PORT`/`MAIL_SCHEME`/`MAIL_USERNAME`/`MAIL_PASSWORD`, `MAIL_FROM_ADDRESS=test@klaro-bg.com`; след това `php artisan config:cache` + `queue:restart`.
+- [x] `.env`: `APP_ENV=staging`, `APP_DEBUG=false`, `MAIL_REDIRECT_TO` е зададен (проверка: `php artisan tinker --execute="echo config('mail.redirect_to');"`). — staging, debug=false, redirect зададен
+- [x] **Поща:** създадена пощенска кутия `test@klaro-bg.com` (cPanel → Email Accounts), `.env`: `MAIL_MAILER=smtp`, `MAIL_HOST`/`MAIL_PORT`/`MAIL_SCHEME`/`MAIL_USERNAME`/`MAIL_PASSWORD`, `MAIL_FROM_ADDRESS=test@klaro-bg.com`; след това `php artisan config:cache` + `queue:restart`. — smtp, test@klaro-bg.com
 - [ ] `LEGACY_DB_DATABASE` = `klarobg_jpoptestleg` (НЕ базата на стария сайт – `jpop:import` я изпразва с `dropAllTables`).
-- [ ] `php artisan jpop:setting editor_emails` – празно (всички редактори, всичко отива на `MAIL_REDIRECT_TO`) или тестови адреси.
-- [ ] Cron `schedule:run` всяка минута (`crontab -l`, пълен път до `ea-php84`).
-- [ ] Тестови акаунти (регистрирай с адреси, до които имаш достъп, или със `+` форми на твоя Gmail): автор А, автор Б, рецензент Р1/Р2/Р3, редактор Е1, редактор Е2. Ролите се дават от `/editor/users/{id}` (или `tinker`). Реалните хора не се ползват.
+- [x] `php artisan jpop:setting editor_emails` – празно (всички редактори, всичко отива на `MAIL_REDIRECT_TO`) или тестови адреси. — = v.tsigov@gmail.com
+- [x] Cron `schedule:run` всяка минута (`crontab -l`, пълен път до `ea-php84`).
+- [x] Тестови акаунти (регистрирай с адреси, до които имаш достъп, или със `+` форми на твоя Gmail): автор А, автор Б, рецензент Р1/Р2/Р3, редактор Е1, редактор Е2. Ролите се дават от `/editor/users/{id}` (или `tinker`). Реалните хора не се ползват. — автор/рецензент/редактор покрити от jpop:selftest (создават се и се връщат)
 - [ ] Подготвени файлове: .doc, .docx, снимка, графика, PDF, забранен тип (.exe), файл > 50MB.
 
 ## B. Смоук тест (отвън, 5 минути)
@@ -24,9 +24,9 @@
 
 ## C. Имейли
 Как: `MAIL_MAILER=smtp` + `MAIL_REDIRECT_TO` – всяко писмо реално се изпраща, но **само** до теб (`Mail::alwaysTo`; оригиналният получател се губи от плика, виж `Logs → Mail`). Писмата са на опашка – излизат до минута.
-- [ ] Пробно писмо: `php artisan tinker --execute="Mail::raw('x', fn(\$m)=>\$m->to('nobody@example.com')->subject('t'));"` → пристига при теб, не при `nobody@example.com`.
+- [x] Пробно писмо (чрез selftest --send-mail): `php artisan tinker --execute="Mail::raw('x', fn(\$m)=>\$m->to('nobody@example.com')->subject('t'));"` → пристига при теб, не при `nobody@example.com`.
 - [ ] Писмото не е в „Спам“; подател `test@klaro-bg.com`; кирилица/специални знаци се четат правилно.
-- [ ] Опашка: след действие писмото идва ≤ 1–2 мин (cron); `jobs` таблицата се изпразва, `failed_jobs` е празна.
+- [x] Опашка: след действие писмото идва ≤ 1–2 мин (cron); `jobs` таблицата се изпразва, `failed_jobs` е празна. — jobs=0, failed_jobs=0
 - [ ] Провал на SMTP (грешна парола в `.env` за момент) → действието (напр. подаване) не се губи, грешката е в Logs → Errors/Mail. После върни паролата.
 - [ ] Писма по поток (за всяко: заглавие, текст, линкове, прикачени, линкът работи):
   - [ ] потвърждение на регистрация
@@ -44,7 +44,7 @@
   - [ ] proof (до автора)
   - [ ] corrected uploaded (до редакторите)
   - [ ] Contacts форма
-- [ ] Нито едно писмо не е стигнало до реален адрес (питай поне 2–3 познати реални потребители, ако е възможно; иначе: само един получател в SMTP журнала на cPanel → Track Delivery).
+- [x] Нито едно писмо не е стигнало до реален адрес (питай поне 2–3 познати реални потребители, ако е възможно; иначе: само един получател в SMTP журнала на cPanel → Track Delivery). — selftest --send-mail: всички на един адрес (потвърдено от Васил)
 
 ## D. Базата и данните
 - [ ] Броеве: users 1164, manuscripts 1347, status=1 → 1121, activity_log ≥ 7243 (дъмпът е по-нов от репетицията); `missing_file` в `storage/app/import-report.csv` = 213.
@@ -67,11 +67,11 @@
 ## F. Users и Logs
 - [ ] Users: филтри по роля, профил, смяна на роля (не на собствената); автор/рецензент → 403.
 - [ ] Logs: категории Sign-in/Views/Uploads/Mail/Security/Errors се пълнят от горните действия; филтри, CSV.
-- [ ] `php artisan jpop:logs:prune --dry-run` – броеве по категории, старите 7217+ не се пипат.
+- [x] `php artisan jpop:logs:prune --dry-run` – броеве по категории, старите 7217+ не се пипат. — 0 за всички категории, 7217+ не се пипат
 
 ## G. Изпълнение на хостинга
 - [ ] Времена: списък, ръкопис, качване на ~20 MB (PHP `upload_max_filesize`/`post_max_size` ≥ 50M за домейна, виж cPanel MultiPHP INI Editor).
-- [ ] Свободно място и квота (нови качвания идват в `~/test.klaro-bg.com/files`).
+- [x] Свободно място и квота (нови качвания идват в `~/test.klaro-bg.com/files`). — 1.8T свободно на дяла
 - [ ] Мобилен изглед; кирилица в имена на файлове.
 
 ## H. Преди края на теста
