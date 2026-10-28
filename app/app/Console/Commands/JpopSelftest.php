@@ -47,6 +47,10 @@ class JpopSelftest extends Command
 
             return 2;
         }
+        // throttle counters (login 10/min, contacts 5/min) live in the cache: use a private one that is reset for every request
+        config(['cache.default' => 'array']);
+        app('cache')->forgetDriver();
+        app()->forgetInstance('cache.store');
         $to = $this->option('to') ?: config('mail.redirect_to');
         if ($this->option('send-mail') && ! $to) {
             $this->error('--send-mail needs MAIL_REDIRECT_TO or --to=address (real letters must never go to real people).');
@@ -79,7 +83,7 @@ class JpopSelftest extends Command
                 $this->sendLetters($letters, $to);
             }
         } catch (Throwable $e) {
-            $this->fail('The run stopped on an unexpected error', get_class($e).': '.$e->getMessage());
+            $this->failCheck('The run stopped on an unexpected error', get_class($e).': '.$e->getMessage());
         } finally {
             DB::rollBack();
             Mail::swap($real);
@@ -258,7 +262,9 @@ class JpopSelftest extends Command
         $a->get("/manuscripts/{$m->id}/corrected");
         $r = $a->post("/manuscripts/{$m->id}/corrected", ['corrected' => $this->upload('corrected.docx')]);
         $this->check('author uploads the corrected manuscript', $r->isRedirect() && $m->files()->where('type', 'corrected_manuscript')->exists(), $this->why($r));
-        $this->check('another user cannot upload a corrected manuscript', $this->login($rv2->email, $pw)->post("/manuscripts/{$m->id}/corrected", ['corrected' => $this->upload('x.docx')])->getStatusCode() === 403);
+        $other = $this->login($rv2->email, $pw);
+        $other->get('/users/welcome');
+        $this->check('another user cannot upload a corrected manuscript', $other->post("/manuscripts/{$m->id}/corrected", ['corrected' => $this->upload('x.docx')])->getStatusCode() === 403);
 
         $e->get("/editor/manuscripts/{$m->id}/proof");
         $r = $e->post("/editor/manuscripts/{$m->id}/proof", ['proof' => $this->upload('proof.pdf'), 'proof_letter' => $this->upload('letter.docx')]);
@@ -333,7 +339,7 @@ class JpopSelftest extends Command
                 Mail::mailer()->sendNow($m);
                 $n++;
             } catch (Throwable $e) {
-                $this->fail('Could not send a letter', $e->getMessage());
+                $this->failCheck('Could not send a letter', $e->getMessage());
             }
         }
         $this->check("$n letters sent to $to", $n === $letters->count());
@@ -399,7 +405,7 @@ class JpopSelftest extends Command
         $this->line(($ok ? '  <info>✓</info> ' : '  <error>✗</error> ').$label.($ok || $detail === '' ? '' : "  — $detail"));
     }
 
-    private function fail(string $label, string $detail): void
+    private function failCheck(string $label, string $detail): void
     {
         $this->check($label, false, $detail);
     }

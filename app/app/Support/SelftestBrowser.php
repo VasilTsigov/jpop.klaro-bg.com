@@ -51,7 +51,11 @@ class SelftestBrowser
 
         // the kernel is reused for every request here, so nothing may leak from the previous user
         app('auth')->forgetGuards();
-        app('session.store')->flush();
+        app('cache')->store('array')->flush();
+
+        // a fresh session store per request (the database handler remembers "this session row exists")
+        app('session')->forgetDrivers();
+        app()->forgetInstance('session.store');
 
         $kernel = app(Kernel::class);
         $response = $kernel->handle($request);
