@@ -5,10 +5,8 @@
 <p>Welcome, {{ auth()->user()->first_name }} {{ auth()->user()->last_name }}.</p>
 <p>Role: <span class="role">{{ $role }}</span></p>
 <div class="cards">
-  @if (in_array($role, ['author', 'editor']))
-    <a class="card" href="{{ route('manuscripts.create') }}"><strong>Submit Manuscripts</strong><span>Send a new manuscript</span></a>
-    <a class="card" href="{{ route('manuscripts.index') }}"><strong>Manuscripts</strong><span>Your submissions</span></a>
-  @endif
+  <a class="card" href="{{ route('manuscripts.create') }}"><strong>Submit Manuscripts</strong><span>Send a new manuscript</span></a>
+  <a class="card" href="{{ route('manuscripts.index') }}"><strong>Manuscripts</strong><span>Your submissions</span></a>
   @if ($role === 'reviewer')
     <a class="card" href="{{ route('reviews.index') }}"><strong>Manuscripts for review</strong><span>Your assignments</span></a>
   @endif

@@ -98,21 +98,28 @@ class AuthorFlowTest extends TestCase
         Mail::assertNothingQueued();
     }
 
-    public function test_editors_can_submit_as_authors_but_reviewers_cannot(): void
+    public function test_every_role_can_submit_and_see_its_own_manuscripts(): void
     {
-        $e = User::factory()->create(['role' => 'editor']);
-        $this->actingAs($e)->get(route('manuscripts.create'))->assertOk();
-        $this->actingAs($e)->get(route('manuscripts.index'))->assertOk();
-
-        foreach (['reviewer'] as $role) {
+        foreach (['author', 'reviewer', 'editor'] as $role) {
             $u = User::factory()->create(['role' => $role]);
-            $this->actingAs($u)->get(route('manuscripts.create'))->assertForbidden();
-            $this->actingAs($u)->get(route('manuscripts.index'))->assertForbidden();
-            $this->actingAs($u)->post(route('manuscripts.store'), $this->payload())->assertForbidden();
+            $this->actingAs($u)->get(route('manuscripts.create'))->assertOk();
+            $this->actingAs($u)->get(route('manuscripts.index'))->assertOk();
+            $this->actingAs($u)->get(route('welcome'))->assertSee('Submit Manuscripts');
         }
         auth()->logout();
         $this->get(route('manuscripts.index'))->assertRedirect(route('login'));
-        $this->assertSame(0, Manuscript::count());
+    }
+
+    public function test_reviewer_submits_a_manuscript_and_gets_own_files_but_not_others(): void
+    {
+        $r = User::factory()->create(['role' => 'reviewer']);
+        $this->actingAs($r)->post(route('manuscripts.store'), $this->payload())->assertRedirect(route('manuscripts.index'));
+        $m = Manuscript::latest('id')->firstOrFail();
+        $this->assertSame($r->id, $m->author_id);
+        $this->actingAs($r)->get(route('manuscripts.text', [$m, 'abstract']))->assertOk();
+
+        $other = User::factory()->create(['role' => 'reviewer']);
+        $this->actingAs($other)->get(route('manuscripts.text', [$m, 'abstract']))->assertForbidden();
     }
 
     public function test_my_manuscripts_lists_only_own_newest_first_five_per_page(): void

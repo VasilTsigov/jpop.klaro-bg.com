@@ -23,10 +23,8 @@
   <nav class="nav" aria-label="Main">
     @auth
       <a href="{{ route('welcome') }}"{!! $cur(route('welcome')) !!}>Home</a>
-      @if (in_array(auth()->user()->role, ['author', 'editor']))
-        <a href="{{ route('manuscripts.create') }}"{!! $cur(route('manuscripts.create')) !!}>Submit Manuscripts</a>
-        <a href="{{ route('manuscripts.index') }}"{!! $cur(route('manuscripts.index')) !!}>Manuscripts</a>
-      @endif
+      <a href="{{ route('manuscripts.create') }}"{!! $cur(route('manuscripts.create')) !!}>Submit Manuscripts</a>
+      <a href="{{ route('manuscripts.index') }}"{!! $cur(route('manuscripts.index')) !!}>Manuscripts</a>
       @if (auth()->user()->role === 'reviewer')
         <a href="{{ route('reviews.index') }}"{!! $cur(route('reviews.index')) !!}>Manuscripts for review</a>
       @endif

@@ -28,10 +28,10 @@ class ManuscriptPolicy
         return $user->role === 'editor';
     }
 
-    /** Submit a new manuscript / list one's own: authors, and editors/admins as authors (decision 2026-10-20). */
+    /** Submit a new manuscript / list one's own: every role – authors, reviewers and editors alike (decision 2026-10-28; the old home page says it too). */
     public function submit(User $user): bool
     {
-        return in_array($user->role, ['author', 'editor'], true);
+        return in_array($user->role, ['author', 'reviewer', 'editor'], true);
     }
 
     /**
@@ -61,12 +61,12 @@ class ManuscriptPolicy
      */
     public function viewText(User $user, Manuscript $manuscript): bool
     {
-        return match ($user->role) {
-            'editor' => true,
-            'author' => $manuscript->author_id === $user->id,
-            'reviewer' => $manuscript->reviews()->where('reviewer_id', $user->id)->where('confirmed_state', '!=', 'declined')->exists(),
-            default => false,
-        };
+        if ($user->role === 'editor' || $manuscript->author_id === $user->id) {
+            return true;
+        }
+
+        return $user->role === 'reviewer'
+            && $manuscript->reviews()->where('reviewer_id', $user->id)->where('confirmed_state', '!=', 'declined')->exists();
     }
 
     public function downloadFile(User $user, Manuscript $manuscript, ManuscriptFile $file): bool
@@ -75,14 +75,15 @@ class ManuscriptPolicy
             return false;
         }
 
-        return match ($user->role) {
-            'editor' => true,
-            // reviews/checklists are not shown to the author (decision 2026-10-20)
-            'author' => $manuscript->author_id === $user->id
-                && in_array($file->type, [...self::SUBMISSION, ...self::AUTHOR_SIDE], true),
-            'reviewer' => $this->reviewerMayDownload($user, $manuscript, $file),
-            default => false,
-        };
+        if ($user->role === 'editor') {
+            return true;
+        }
+        // the manuscript's own author (any role): reviews/checklists are not shown to the author (decision 2026-10-20)
+        if ($manuscript->author_id === $user->id) {
+            return in_array($file->type, [...self::SUBMISSION, ...self::AUTHOR_SIDE], true);
+        }
+
+        return $user->role === 'reviewer' && $this->reviewerMayDownload($user, $manuscript, $file);
     }
 
     private function reviewerMayDownload(User $user, Manuscript $manuscript, ManuscriptFile $file): bool

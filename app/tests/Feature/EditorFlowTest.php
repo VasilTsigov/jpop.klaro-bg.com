@@ -111,6 +111,16 @@ class EditorFlowTest extends TestCase
         $this->get('/editor/lists/other')->assertNotFound();
     }
 
+    public function test_a_reviewer_cannot_be_assigned_to_their_own_manuscript(): void
+    {
+        $m = $this->manuscript();
+        $m->forceFill(['author_id' => $this->reviewer->id])->save();
+
+        $this->actingAs($this->editor)->get(route('editor.assign', [$m, 1]))->assertOk()->assertDontSee($this->reviewer->email);
+        $this->actingAs($this->editor)->post(route('editor.assign', [$m, 1]), ['reviewer_id' => $this->reviewer->id])->assertSessionHasErrors('reviewer_id');
+        $this->assertSame(0, ManuscriptReview::where('manuscript_id', $m->id)->whereNotNull('reviewer_id')->count());
+    }
+
     public function test_assigning_a_reviewer_stores_the_slot_and_mails_one_time_links(): void
     {
         $m = $this->manuscript();

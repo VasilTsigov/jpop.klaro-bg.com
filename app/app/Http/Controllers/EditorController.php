@@ -50,7 +50,8 @@ class EditorController extends Controller
     public function assignForm(Manuscript $manuscript, int $slot)
     {
         Gate::authorize('manageReview', $manuscript);
-        $reviewers = User::where('role', 'reviewer')->orderBy('last_name')->orderBy('first_name')->get();
+        // a reviewer who submitted this manuscript cannot review it
+        $reviewers = User::where('role', 'reviewer')->where('id', '!=', $manuscript->author_id)->orderBy('last_name')->orderBy('first_name')->get();
 
         return view('editor.assign', compact('manuscript', 'slot', 'reviewers'));
     }
@@ -59,7 +60,7 @@ class EditorController extends Controller
     {
         Gate::authorize('manageReview', $manuscript);
         $data = $request->validate([
-            'reviewer_id' => ['required', Rule::exists('users', 'id')->where('role', 'reviewer')],
+            'reviewer_id' => ['required', Rule::exists('users', 'id')->where('role', 'reviewer')->where(fn ($q) => $q->where('id', '!=', $manuscript->author_id ?? 0))],
         ]);
         if ((int) $manuscript->status !== 0) {
             return back()->withErrors('Reviewers can be assigned only to manuscripts in progress.');
