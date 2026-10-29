@@ -2,6 +2,8 @@
 
 `05-manual-comparison.md` е пълният чеклист. Повечето му редове вече са покрити автоматично: `php artisan test` (87 теста), `php artisan jpop:selftest` на test.klaro-bg.com (71 проверки, поток автор → редактор → рецензент → proof) и уеб проверките от 2026-10-28 (`07-staging-checklist.md`). Тук е останалото – онова, което се вижда само с очи, при сравнение със стария сайт или с реална поща.
 
+**Локална база (2026-10-29, WSL Ubuntu-26.04, PHP 8.5.4 / Laravel 12.70)** – вече машинно проверено, не го повтаряй на ръка: `php artisan test` = 87 ✓ (550 assertions); Python характеризиращи = 34 ✓; `jpop:selftest --force` = 68 ✓ / 3 ✗ (само среда: upload_max 2M, липсват legacy `attach/`, APP_DEBUG=on); `jpop:import --files=../files` = exit 0, броеве 1:1 – users 1164, manuscripts 1347, status 9/1121/217, manuscript_files 8668, manuscript_reviews 2012, activity_log 7217; `import-report.csv` = 237 реда (missing_file 210, bad_date 19, orphan_author 3, dangling_reviewer 3, duplicate_email 2). **Внимание:** локалният дъмп е от 2026-10-20 и дава `missing_file` = 210, докато `07-staging-checklist.md` D50 очаква 213 (по-нов дъмп на сървъра) – сверката на това число става само на test.klaro-bg.com.
+
 Отбелязвай `[x]` съвпада, `[~]` разлика (опиши в таблицата долу), `[!]` дефект. Две раздела: стар сайт – https://jpop.klaro-bg.com, нов – https://test.klaro-bg.com (basic auth).
 
 ## 1. Поща (15 мин) – 05 §14
@@ -17,7 +19,8 @@
 - [ ] Един рецензент с много назначения: списъкът му е същият.
 - [ ] Червените редове в „Rejected“ (≥2 препоръки „Rejected“) са същите.
 - [ ] Вход със стар акаунт (парола от преди миграцията): влиза и втори път.
-- [ ] Двата дублирани имейла (622/712, 1373/1374): какво става при вход – приемливо ли е.
+- [ ] Двата дублирани имейла: `622|712` = kishan.swaroop@rediffmail.com и `1373|1374` = vuquocluan07@yahoo.com.vn – кой от двата акаунта влиза при този имейл и приемливо ли е.
+- [ ] Ръкописите с аномалия от отчета – най-добрите кандидати за сверка със стария екран: `34` (липсва author 83), `342` (липсва author 438), `343` (липсва author 441 **и** slot 1 → reviewer 438), `59` (slot 1 → reviewer 91), `322` (slot 3 → reviewer 126). Да се види как изглеждат в новия (празен/липсващ автор или рецензент) срещу стария.
 
 ## 3. Външен вид (20 мин) – 05 §15
 - [ ] Телефон (или DevTools 375 px): вход, „My manuscripts“, форма за подаване, списък на редактор, abstract – без хоризонтален скрол.
@@ -29,10 +32,10 @@
 ## 4. Решения, които са твои (10 мин)
 - [ ] Приемам ли таблицата „Приети отклонения“ в `05-manual-comparison.md` като окончателна?
 - [ ] Заглавията на писмата (L9): оставяме както са в стария, или ги оправяме?
-- [ ] Рецензентът получава „Thank you for the submitted manuscript“ при собствено подаване (решено 2026-10-28: да).
+- [x] Рецензентът получава „Thank you for the submitted manuscript“ при собствено подаване (решено 2026-10-28: да) – **потвърдено в кода (2026-10-29)**: `ManuscriptController::store` ред 85 `EditorialMail::deliver($user->email, new SubmissionReceived($user, $manuscript))` е безусловно, без проверка за роля; selftest връща `SubmissionReceived → selftest…-Reviewer2@…`. **Забележка:** съществуващият тест (`AuthorFlowTest` ред 72) проверява писмото само за автор, т.е. това поведение не е заключено от тест – ако се иска гаранция срещу регресия, трябва да се добави отделен случай за рецензент.
 
 ## 5. Преди продукция (не е сравнение, но блокира край на етапа)
-- [ ] `editor_emails` на реални адреси (`php artisan jpop:setting editor_emails "a@x,b@y"`).
+- [ ] `editor_emails` на реални адреси (`php artisan jpop:setting editor_emails "a@x,b@y"`). Механизмът е готов и тестван – `EditorRecipients::emails()` чете `settings.editor_emails`, после `config('jpop.editor_emails')` (`JPOP_EDITOR_EMAILS`, по подразбиране празно), после всички потвърдени редактори; командата валидира адресите (`MailTest::test_editor_emails_command_sets_recipients_and_validates`). Реални адреси не са закодирани – остава само да се въведат на сървъра.
 - [ ] `APP_ENV=production`, без `MAIL_REDIRECT_TO`, без basic auth; DB парола нова.
 - [ ] Репетиция по `04-cutover.md` (или решение, че `files/` се чете от стария хостинг, както на теста).
 - [ ] Тестови ръкописи/акаунти от теста изтрити, или `migrate:fresh` + `jpop:import`.
