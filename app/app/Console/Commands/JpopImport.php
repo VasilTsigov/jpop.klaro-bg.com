@@ -33,6 +33,7 @@ class JpopImport extends Command
 
     public function handle(): int
     {
+        $this->report = []; // the command instance can be reused in one process (tests): do not accumulate
         if ($dump = $this->option('dump')) {
             $this->loadDump($dump);
         }

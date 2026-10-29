@@ -4,3 +4,4 @@
 /Connections/localhost.php
 *.log
 __pycache__/
+.aider*

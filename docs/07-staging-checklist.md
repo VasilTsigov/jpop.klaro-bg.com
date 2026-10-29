@@ -47,7 +47,7 @@
 - [x] Нито едно писмо не е стигнало до реален адрес (питай поне 2–3 познати реални потребители, ако е възможно; иначе: само един получател в SMTP журнала на cPanel → Track Delivery). — selftest --send-mail: всички на един адрес (потвърдено от Васил)
 
 ## D. Базата и данните
-- [ ] Броеве: users 1164, manuscripts 1347, status=1 → 1121, activity_log ≥ 7243 (дъмпът е по-нов от репетицията); `missing_file` в `storage/app/import-report.csv` = 213.
+- [ ] Броеве: users 1164, manuscripts 1347, status=1 → 1121, activity_log ≥ 7243 (дъмпът е по-нов от репетицията); `missing_file` в `storage/app/import-report.csv` = 213. — **локално проверено 2026-10-29** (WSL, `jpop:import --files=../files`): users 1164 ✓, manuscripts 1347 ✓, status 9/1121/217 ✓, manuscript_files 8668, manuscript_reviews 2012, activity_log 7217, отчет 237 реда = missing_file **210** + bad_date 19 + orphan_author 3 + dangling_reviewer 3 + duplicate_email 2. Тук остава да се сверят `activity_log ≥ 7243` и `missing_file = 213` **на сървъра** (по-нов дъмп; локалният е от 2026-10-20 и дава 210).
 - [x] Списъци: в процес / отхвърлени / публикувани (броячите отговарят на данните); последната страница се отваря. — всички 200, последни страници rejected p75, published p15 (p+1 = празна), ≤0.3s
 - [ ] 10 произволни ръкописа сравнени със стария сайт (заглавие, код `JPOP…`, дати, рецензенти, препоръки).
 - [x] Ръкопис с липсващ файл → 404 със съобщение, не 500. Дата `Europe/Sofia…` се показва без грешка. — /files/21 → 404, без 500
